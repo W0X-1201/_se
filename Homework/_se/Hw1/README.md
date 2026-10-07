@@ -2,6 +2,32 @@
 
 一個用 Rust 手寫 HTTP/1.1 協定的類 curl 命令列工具，作為《作業 1》。
 
+## 專案用途
+
+`rcurl` 是一個終端機的網路請求工具，功能與著名的 `curl` 相容（選項與退出碼對齊），可用來：
+
+- **抓取網頁 / API 資料**：下載 HTML、JSON 等資源到終端機或檔案
+- **發送各種 HTTP 請求**：GET、POST、PUT、DELETE… 送表單、送 JSON 都可以
+- **除錯網路程式**：`-v` 顯示完整的請求與回應 header，`-i` 一併輸出回應狀態列
+- **模擬瀏覽器行為**：自訂 User-Agent、Header、跟隨 302 導向、gzip 壓縮
+- **學術用途（本作業重點）**：不依賴現成 HTTP 函式庫，從零實作 HTTP/1.1 協定的解析與組建
+
+```powershell
+# 抓網頁
+.\rcurl.exe https://example.com/
+
+# POST 送 JSON
+.\rcurl.exe --json '{\"a\":1}' https://httpbin.org/post
+
+# 跟隨導向並存成檔案
+.\rcurl.exe -L -O https://example.com/
+
+# 看請求/回應細節
+.\rcurl.exe -v https://example.com/
+```
+
+## 實作特色
+
 - **不使用** reqwest / ureq 等 HTTP 函式庫：請求組建、回應解析（`Content-Length` / `chunked` / 連線關閉）、URL 解析、CLI 參數解析、Base64 全部自行實作
 - 相依套件只有兩個：`native-tls`（HTTPS，Windows 上走 SChannel）與 `flate2`（gzip/deflate 解壓）
 
