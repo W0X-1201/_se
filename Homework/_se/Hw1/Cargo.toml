@@ -1,0 +1,9 @@
+[package]
+name = "rcurl"
+version = "0.1.0"
+edition = "2021"
+description = "A curl-like HTTP client written in Rust with a hand-rolled HTTP/1.1 implementation"
+
+[dependencies]
+native-tls = "0.2"
+flate2 = "1"
