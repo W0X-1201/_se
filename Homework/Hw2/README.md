@@ -31,6 +31,50 @@ SQLite（預設）⇄ PostgreSQL（DB_CLIENT 切換）
 | 管理員 | 帳號與角色管理、課程管理（授課教師、人數上限）、**選課時間窗**、**校園公告發布**（可指定對象）、數據分析（各系人數長條圖、課程滿額率） |
 | 共同 | 登入驗證（Bearer Token）、角色導向、**校園公告板**（依角色過濾顯示） |
 
+## 系統架構圖
+
+![系統架構圖](docs/architecture.png)
+
+## 資料庫 ER 圖
+
+![資料庫 ER 圖](docs/er-diagram.png)
+
+## 系統畫面
+
+### 登入頁
+
+![登入頁](docs/01-login.png)
+
+### 學生端
+
+| 課表 | 選課作業（搜尋與篩選） |
+|------|------|
+| ![學生課表](docs/02-student-schedule.png) | ![選課作業](docs/03-student-courses.png) |
+
+| 成績與 GPA | 出缺勤查詢 |
+|------|------|
+| ![成績與學分](docs/04-student-grades.png) | ![出缺勤查詢](docs/05-student-attendance.png) |
+
+![校園公告（學生）](docs/06-student-announcements.png)
+
+### 教師端
+
+| 我的課程 | 成績輸入與發布 |
+|------|------|
+| ![我的課程](docs/07-teacher-courses.png) | ![成績輸入](docs/08-teacher-grade-input.png) |
+
+![點名系統](docs/09-teacher-attendance.png)
+
+### 管理端
+
+| 帳號與權限 | 課程管理 |
+|------|------|
+| ![帳號與權限](docs/10-admin-users.png) | ![課程管理](docs/11-admin-courses.png) |
+
+| 校園公告 | 數據分析 |
+|------|------|
+| ![校園公告管理](docs/12-admin-announcements.png) | ![數據分析](docs/13-admin-stats.png) |
+
 ## 技術架構
 
 | 層級 | 技術 |
@@ -79,6 +123,7 @@ Hw2/
 │   ├── teacher.html         # 教師端
 │   ├── admin.html           # 管理端
 │   └── style.css            # 共用正式風格樣式
+├── docs/                    # README 用圖片（架構圖、ER 圖、系統截圖）
 ├── migrations/              # 資料表結構（Knex migration，共 11 個）
 │   ├── *_create_users.js / *_create_courses.js / *_create_enrollments.js
 │   ├── *_add_role_to_users.js / *_add_teacher_id_to_courses.js
