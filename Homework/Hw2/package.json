@@ -1,0 +1,26 @@
+{
+  "name": "nqu-system",
+  "version": "1.0.0",
+  "description": "NQU login system - frontend (HTML/JS) + backend (Express) + swappable database (SQLite / PostgreSQL via Knex.js)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "migrate": "knex migrate:latest",
+    "migrate:make": "knex migrate:make",
+    "seed": "knex seed:run",
+    "db:reset": "knex migrate:rollback && knex migrate:latest && knex seed:run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "knex": "^3.3.0",
+    "pg": "^8.23.1",
+    "sqlite3": "^6.0.1"
+  },
+  "devDependencies": {
+    "knex-cli": "^1.0.1"
+  }
+}

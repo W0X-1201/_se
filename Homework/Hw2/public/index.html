@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>NQU 系統登入</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center; border-top: 5px solid #0056b3; }
+        .form-group { text-align: left; margin-bottom: 15px; }
+        input { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #0056b3; color: white; border: none; cursor: pointer; font-size: 16px; }
+        #message { margin-top: 15px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>NQU 登入系統</h2>
+        <div class="form-group">
+            <label>學號</label>
+            <input type="text" id="studentId" placeholder="請輸入學號">
+        </div>
+        <div class="form-group">
+            <label>密碼</label>
+            <input type="password" id="password" placeholder="請輸入密碼">
+        </div>
+        <button onclick="doLogin()">登入</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        async function doLogin() {
+            const studentId = document.getElementById('studentId').value;
+            const password = document.getElementById('password').value;
+            const msgDiv = document.getElementById('message');
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    msgDiv.style.color = "green";
+                    msgDiv.innerText = data.message;
+                } else {
+                    msgDiv.style.color = "red";
+                    msgDiv.innerText = data.message;
+                }
+            } catch (error) {
+                msgDiv.innerText = "無法連線到伺服器";
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') doLogin();
+        });
+    </script>
+</body>
+</html>
