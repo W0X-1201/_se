@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>管理端 - NQU 校務資訊系統</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand">NQU 校務資訊系統<small>系統管理端</small></div>
+        <div class="user-area">
+            <span class="role-tag">管理員</span>
+            <span id="userInfo">...</span>
+            <button class="btn secondary sm" onclick="logout()">登出</button>
+        </div>
+    </header>
+
+    <div class="layout">
+        <nav class="sidebar">
+            <div class="side-title">系統管理</div>
+            <a class="active" data-view="users">帳號與權限</a>
+            <a data-view="courses">課程管理</a>
+            <a data-view="settings">選課時間窗</a>
+            <a data-view="announcements">校園公告</a>
+            <a data-view="stats">數據分析</a>
+        </nav>
+
+        <main class="content">
+            <div id="message"></div>
+
+            <!-- 帳號與權限 -->
+            <div id="usersView">
+                <h1 class="page-title">帳號與權限</h1>
+                <div class="block">
+                    <div class="block-header">建立帳號</div>
+                    <div class="block-body">
+                        <div class="form-inline">
+                            <div class="form-row"><label>帳號</label><input type="text" id="nuId" placeholder="學號／教職員編號"></div>
+                            <div class="form-row"><label>密碼</label><input type="text" id="nuPwd" placeholder="初始密碼"></div>
+                            <div class="form-row"><label>姓名</label><input type="text" id="nuName"></div>
+                            <div class="form-row"><label>系所</label><input type="text" id="nuDept"></div>
+                            <div class="form-row"><label>角色</label>
+                                <select id="nuRole">
+                                    <option value="student">學生</option>
+                                    <option value="teacher">教師</option>
+                                    <option value="admin">管理員</option>
+                                </select>
+                            </div>
+                            <div class="form-row"><label>&nbsp;</label><button class="btn" onclick="createUser()">建立</button></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="block">
+                    <div class="block-header">帳號清單</div>
+                    <div class="block-body">
+                        <table class="data" id="userTable">
+                            <thead>
+                                <tr>
+                                    <th>帳號</th><th>姓名</th><th>系所</th><th class="center">角色</th><th class="center">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 課程管理 -->
+            <div id="coursesView" class="hidden">
+                <h1 class="page-title">課程管理</h1>
+                <div class="block">
+                    <div class="block-header">新增課程</div>
+                    <div class="block-body">
+                        <div class="form-inline">
+                            <div class="form-row"><label>課號</label><input type="text" id="ncNo" style="width:100px"></div>
+                            <div class="form-row"><label>課程名稱</label><input type="text" id="ncName" style="width:130px"></div>
+                            <div class="form-row"><label>星期</label>
+                                <select id="ncDay" style="width:80px">
+                                    <option value="1">一</option><option value="2">二</option><option value="3">三</option>
+                                    <option value="4">四</option><option value="5">五</option>
+                                </select>
+                            </div>
+                            <div class="form-row"><label>起節</label><input type="number" id="ncStart" min="1" max="10" value="1" style="width:70px"></div>
+                            <div class="form-row"><label>畢節</label><input type="number" id="ncEnd" min="1" max="10" value="2" style="width:70px"></div>
+                            <div class="form-row"><label>教室</label><input type="text" id="ncRoom" style="width:80px"></div>
+                            <div class="form-row"><label>學分</label><input type="number" id="ncCredit" min="0" value="2" style="width:70px"></div>
+                            <div class="form-row"><label>人數上限</label><input type="number" id="ncCap" min="1" value="50" style="width:80px"></div>
+                            <div class="form-row"><label>&nbsp;</label><button class="btn" onclick="createCourse()">新增</button></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="block">
+                    <div class="block-header">課程清單（可調整授課教師與人數上限）</div>
+                    <div class="block-body">
+                        <table class="data" id="adminCourseTable">
+                            <thead>
+                                <tr>
+                                    <th>課號</th><th>課程名稱</th><th>時間</th><th>教室</th>
+                                    <th class="center">學分</th><th class="center">選課/上限</th><th class="center">滿額率</th>
+                                    <th>授課教師</th><th class="center">人數上限</th><th class="center">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 選課時間窗 -->
+            <div id="settingsView" class="hidden">
+                <h1 class="page-title">選課時間窗</h1>
+                <div class="block">
+                    <div class="block-header">
+                        目前狀態
+                        <span id="windowBadge" class="tag" style="float:right"></span>
+                    </div>
+                    <div class="block-body">
+                        <div class="form-inline">
+                            <div class="form-row">
+                                <label>開放時間</label>
+                                <input type="datetime-local" id="setOpen">
+                            </div>
+                            <div class="form-row">
+                                <label>關閉時間</label>
+                                <input type="datetime-local" id="setClose">
+                            </div>
+                            <div class="form-row">
+                                <label>畢業要求學分</label>
+                                <input type="number" id="setGrad" min="0" style="width:110px">
+                            </div>
+                            <div class="form-row"><label>&nbsp;</label><button class="btn" onclick="saveSettings()">儲存設定</button></div>
+                            <div class="form-row"><label>&nbsp;</label><button class="btn danger" onclick="closeEnroll()">立即關閉選課</button></div>
+                            <div class="form-row"><label>&nbsp;</label><button class="btn success" onclick="openEnroll()">立即開放選課</button></div>
+                        </div>
+                        <div class="muted" style="margin-top:12px">
+                            留空表示不設限（預設開放）。設定起訖時間後，學生僅能在該區間內選課與退選。
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 校園公告 -->
+            <div id="announcementsView" class="hidden">
+                <h1 class="page-title">校園公告</h1>
+                <div class="block">
+                    <div class="block-header">發布新公告</div>
+                    <div class="block-body">
+                        <div class="form-inline">
+                            <div class="form-row"><label>標題</label><input type="text" id="naTitle" style="width:320px" placeholder="公告標題"></div>
+                            <div class="form-row"><label>發布對象</label>
+                                <select id="naAudience">
+                                    <option value="all">全體</option>
+                                    <option value="student">僅學生</option>
+                                    <option value="teacher">僅教師</option>
+                                    <option value="admin">僅管理員</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row" style="margin-top:8px"><label>內容</label><textarea id="naContent" rows="4" style="width:100%;max-width:760px" placeholder="公告內容"></textarea></div>
+                        <div style="margin-top:10px"><button class="btn" onclick="createAnnouncement()">發布公告</button></div>
+                    </div>
+                </div>
+                <div class="block">
+                    <div class="block-header">公告列表</div>
+                    <div class="block-body">
+                        <table class="data" id="adminAnnounceTable">
+                            <thead>
+                                <tr><th>發布日期</th><th>標題與內容</th><th class="center">對象</th><th>發布人</th><th class="center">操作</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 數據分析 -->
+            <div id="statsView" class="hidden">
+                <h1 class="page-title">數據分析</h1>
+                <div class="stat-grid">
+                    <div class="stat"><div class="num" id="stStudents">0</div><div class="label">學生人數</div></div>
+                    <div class="stat"><div class="num" id="stTeachers">0</div><div class="label">教師人數</div></div>
+                    <div class="stat"><div class="num" id="stCourses">0</div><div class="label">開課數</div></div>
+                    <div class="stat"><div class="num" id="stEnroll">0</div><div class="label">選課筆數</div></div>
+                </div>
+
+                <div class="block">
+                    <div class="block-header">各系學生人數</div>
+                    <div class="block-body" id="deptChart"></div>
+                </div>
+
+                <div class="block">
+                    <div class="block-header">課程滿額率</div>
+                    <div class="block-body">
+                        <table class="data" id="fillTable">
+                            <thead>
+                                <tr><th>課號</th><th>課程名稱</th><th class="center">選課人數</th><th class="center">人數上限</th><th>滿額率</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const TITLES = { users: '帳號與權限', courses: '課程管理', settings: '選課時間窗', announcements: '校園公告', stats: '數據分析' };
+        const VIEWS = ['users', 'courses', 'settings', 'announcements', 'stats'];
+        const AUD_NAME = { all: '全體', student: '學生', teacher: '教師', admin: '管理員' };
+        const DAYS = ['一', '二', '三', '四', '五'];
+        const ROLE_NAME = { student: '學生', teacher: '教師', admin: '管理員' };
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+        if (!token) window.location.href = '/';
+        if (user && user.role !== 'admin') {
+            window.location.href = user.role === 'teacher' ? '/teacher.html' : '/dashboard.html';
+        }
+
+        let teachers = [];
+
+        function headers() {
+            return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+        }
+
+        function msg(text, ok = true) {
+            const el = document.getElementById('message');
+            el.textContent = text || '';
+            el.style.color = ok ? '#1e7a45' : '#a92c2c';
+            if (text) setTimeout(() => { el.textContent = ''; }, 4000);
+        }
+
+        function showView(name) {
+            VIEWS.forEach((n) => {
+                document.getElementById(n + 'View').classList.toggle('hidden', n !== name);
+            });
+            document.querySelectorAll('.sidebar a').forEach((a) => {
+                a.classList.toggle('active', a.dataset.view === name);
+            });
+            document.getElementById('pageTitle') && (document.getElementById('pageTitle').textContent = TITLES[name]);
+            if (name === 'users') loadUsers();
+            if (name === 'courses') loadAdminCourses();
+            if (name === 'settings') loadSettings();
+            if (name === 'announcements') loadAnnouncements();
+            if (name === 'stats') loadStats();
+        }
+
+        document.querySelectorAll('.sidebar a').forEach((a) => {
+            a.addEventListener('click', () => showView(a.dataset.view));
+        });
+
+        // ===== 帳號管理 =====
+        async function loadUsers() {
+            const res = await fetch('/api/admin/users', { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+            teachers = data.users.filter((u) => u.role === 'teacher');
+
+            document.querySelector('#userTable tbody').innerHTML = data.users.map((u) => `<tr>
+                <td>${u.student_id}</td>
+                <td>${u.name}</td>
+                <td>${u.department || '-'}</td>
+                <td class="center">
+                    <select data-id="${u.id}" class="role-select" style="width:auto">
+                        <option value="student" ${u.role === 'student' ? 'selected' : ''}>學生</option>
+                        <option value="teacher" ${u.role === 'teacher' ? 'selected' : ''}>教師</option>
+                        <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>管理員</option>
+                    </select>
+                </td>
+                <td class="center">
+                    <button class="btn sm" onclick="saveRole(${u.id})">更新角色</button>
+                    <button class="btn secondary sm" onclick="resetPwd(${u.id})">重設密碼</button>
+                </td>
+            </tr>`).join('');
+        }
+
+        async function createUser() {
+            const body = {
+                studentId: document.getElementById('nuId').value.trim(),
+                password: document.getElementById('nuPwd').value.trim(),
+                name: document.getElementById('nuName').value.trim(),
+                department: document.getElementById('nuDept').value.trim(),
+                role: document.getElementById('nuRole').value
+            };
+            const res = await fetch('/api/admin/users', { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+            const data = await res.json();
+            msg(data.message, data.success);
+            if (data.success) {
+                ['nuId', 'nuPwd', 'nuName', 'nuDept'].forEach((id) => document.getElementById(id).value = '');
+                loadUsers();
+            }
+        }
+
+        async function saveRole(id) {
+            const sel = document.querySelector(`.role-select[data-id="${id}"]`);
+            const res = await fetch('/api/admin/users/' + id, {
+                method: 'PATCH', headers: headers(), body: JSON.stringify({ role: sel.value })
+            });
+            const data = await res.json();
+            msg(data.message, data.success);
+        }
+
+        async function resetPwd(id) {
+            const pwd = prompt('請輸入新密碼：');
+            if (!pwd) return;
+            const res = await fetch('/api/admin/users/' + id, {
+                method: 'PATCH', headers: headers(), body: JSON.stringify({ password: pwd })
+            });
+            const data = await res.json();
+            msg(data.message, data.success);
+        }
+
+        // ===== 課程管理 =====
+        async function loadAdminCourses() {
+            const res = await fetch('/api/admin/courses', { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+
+            if (!teachers.length) {
+                const u = await fetch('/api/admin/users', { headers: headers() });
+                const ud = await u.json();
+                teachers = ud.users.filter((x) => x.role === 'teacher');
+            }
+
+            document.querySelector('#adminCourseTable tbody').innerHTML = data.courses.map((c) => `<tr>
+                <td>${c.course_no}</td>
+                <td>${c.name}</td>
+                <td>週${DAYS[c.weekday - 1]} ${c.start_period}-${c.end_period} 節</td>
+                <td>${c.classroom}</td>
+                <td class="center">${c.credit}</td>
+                <td class="center">${c.enrolled} / ${c.capacity}</td>
+                <td class="center">
+                    <span class="tag ${c.fillRate >= 100 ? 'red' : c.fillRate >= 80 ? 'gold' : 'green'}">${c.fillRate}%</span>
+                </td>
+                <td>
+                    <select data-id="${c.id}" class="teacher-select" style="width:auto">
+                        <option value="">未指定</option>
+                        ${teachers.map((t) => `<option value="${t.id}" ${c.teacher_id === t.id ? 'selected' : ''}>${t.name}</option>`).join('')}
+                    </select>
+                </td>
+                <td class="center"><input type="number" data-id="${c.id}" class="cap-input" value="${c.capacity}" min="1" style="width:70px;text-align:center"></td>
+                <td class="center"><button class="btn sm" onclick="saveCourse(${c.id})">儲存</button></td>
+            </tr>`).join('');
+        }
+
+        async function saveCourse(id) {
+            const teacherId = document.querySelector(`.teacher-select[data-id="${id}"]`).value;
+            const capacity = Number(document.querySelector(`.cap-input[data-id="${id}"]`).value);
+            const res = await fetch('/api/admin/courses/' + id, {
+                method: 'PATCH', headers: headers(),
+                body: JSON.stringify({ teacher_id: teacherId ? Number(teacherId) : null, capacity })
+            });
+            const data = await res.json();
+            msg(data.message, data.success);
+            if (data.success) loadAdminCourses();
+        }
+
+        async function createCourse() {
+            const body = {
+                course_no: document.getElementById('ncNo').value.trim(),
+                name: document.getElementById('ncName').value.trim(),
+                weekday: Number(document.getElementById('ncDay').value),
+                start_period: Number(document.getElementById('ncStart').value),
+                end_period: Number(document.getElementById('ncEnd').value),
+                classroom: document.getElementById('ncRoom').value.trim(),
+                credit: Number(document.getElementById('ncCredit').value),
+                capacity: Number(document.getElementById('ncCap').value),
+                teacher_id: teachers.length ? teachers[0].id : null,
+                teacher: teachers.length ? teachers[0].name : ''
+            };
+            const res = await fetch('/api/admin/courses', { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+            const data = await res.json();
+            msg(data.message, data.success);
+            if (data.success) {
+                ['ncNo', 'ncName', 'ncRoom'].forEach((id) => document.getElementById(id).value = '');
+                loadAdminCourses();
+            }
+        }
+
+        // ===== 時間窗 =====
+        async function loadSettings() {
+            const res = await fetch('/api/admin/settings', { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+            document.getElementById('setOpen').value = data.settings.enroll_open_at || '';
+            document.getElementById('setClose').value = data.settings.enroll_close_at || '';
+            document.getElementById('setGrad').value = data.settings.grad_credits;
+            const badge = document.getElementById('windowBadge');
+            badge.textContent = data.window.message;
+            badge.className = 'tag ' + (data.window.open ? 'green' : 'red');
+        }
+
+        async function saveSettings(extra = {}) {
+            const body = {
+                enroll_open_at: document.getElementById('setOpen').value,
+                enroll_close_at: document.getElementById('setClose').value,
+                grad_credits: document.getElementById('setGrad').value,
+                ...extra
+            };
+            const res = await fetch('/api/admin/settings', { method: 'PUT', headers: headers(), body: JSON.stringify(body) });
+            const data = await res.json();
+            msg(data.message, data.success);
+            loadSettings();
+        }
+
+        function openEnroll() {
+            const now = new Date(Date.now() - 60000);
+            const end = new Date(Date.now() + 7 * 24 * 3600 * 1000);
+            saveSettings({ enroll_open_at: toLocal(now), enroll_close_at: toLocal(end) });
+        }
+
+        function closeEnroll() {
+            const now = new Date(Date.now() - 60000);
+            saveSettings({ enroll_open_at: toLocal(new Date(Date.now() - 86400000)), enroll_close_at: toLocal(now) });
+        }
+
+        function toLocal(d) {
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        // ===== 校園公告 =====
+        async function loadAnnouncements() {
+            const res = await fetch('/api/admin/announcements', { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+            document.querySelector('#adminAnnounceTable tbody').innerHTML = data.announcements.map((a) => `<tr>
+                <td style="white-space:nowrap">${new Date(a.created_at).toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+                <td><b>${a.title}</b><div style="margin-top:4px;white-space:pre-wrap">${a.content}</div></td>
+                <td class="center"><span class="tag ${a.audience === 'all' ? 'green' : 'gold'}">${AUD_NAME[a.audience] || a.audience}</span></td>
+                <td>${a.author || '-'}</td>
+                <td class="center"><button class="btn danger sm" onclick="deleteAnnouncement(${a.id})">刪除</button></td>
+            </tr>`).join('') || '<tr><td colspan="5" class="center muted">尚無公告</td></tr>';
+        }
+
+        async function createAnnouncement() {
+            const body = {
+                title: document.getElementById('naTitle').value.trim(),
+                content: document.getElementById('naContent').value.trim(),
+                audience: document.getElementById('naAudience').value
+            };
+            if (!body.title || !body.content) return msg('標題與內容為必填', false);
+            const res = await fetch('/api/admin/announcements', { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+            const data = await res.json();
+            msg(data.message, data.success);
+            if (data.success) {
+                document.getElementById('naTitle').value = '';
+                document.getElementById('naContent').value = '';
+                loadAnnouncements();
+            }
+        }
+
+        async function deleteAnnouncement(id) {
+            if (!confirm('確定要刪除這則公告？')) return;
+            const res = await fetch('/api/admin/announcements/' + id, { method: 'DELETE', headers: headers() });
+            const data = await res.json();
+            msg(data.message, data.success);
+            if (data.success) loadAnnouncements();
+        }
+
+        // ===== 數據分析 =====
+        async function loadStats() {
+            const res = await fetch('/api/admin/stats', { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+
+            document.getElementById('stStudents').textContent = data.totals.students;
+            document.getElementById('stTeachers').textContent = data.totals.teachers;
+            document.getElementById('stCourses').textContent = data.totals.courses;
+            document.getElementById('stEnroll').textContent = data.totals.enrollments;
+
+            const max = Math.max(...data.departments.map((d) => d.count), 1);
+            document.getElementById('deptChart').innerHTML = data.departments.map((d) => `
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                    <div style="width:130px;text-align:right;font-size:13px">${d.department}</div>
+                    <div style="flex:1;background:#eef2f7;border:1px solid #d4dae2;height:22px">
+                        <div style="width:${(d.count / max) * 100}%;background:#14375e;color:#fff;font-size:12px;line-height:20px;padding-right:6px;text-align:right;min-width:30px">${d.count} 人</div>
+                    </div>
+                </div>`).join('') || '<div class="muted">無資料</div>';
+
+            document.querySelector('#fillTable tbody').innerHTML = data.courses.map((c) => `<tr>
+                <td>${c.course_no}</td>
+                <td>${c.name}</td>
+                <td class="center">${c.enrolled}</td>
+                <td class="center">${c.capacity}</td>
+                <td>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <div style="flex:1;background:#eef2f7;border:1px solid #d4dae2;height:16px;min-width:120px">
+                            <div style="width:${Math.min(100, c.fillRate)}%;background:${c.fillRate >= 100 ? '#a92c2c' : c.fillRate >= 80 ? '#c8a951' : '#1e7a45'};height:100%"></div>
+                        </div>
+                        <span style="font-size:12px;width:38px">${c.fillRate}%</span>
+                    </div>
+                </td>
+            </tr>`).join('');
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST', headers: headers() }).catch(() => {});
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+
+        document.getElementById('userInfo').textContent = user ? `${user.name}（${user.studentId}）` : '...';
+        loadUsers();
+    </script>
+</body>
+</html>

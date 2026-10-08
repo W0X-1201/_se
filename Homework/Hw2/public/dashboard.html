@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>學生端 - NQU 校務資訊系統</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand">NQU 校務資訊系統<small>學生端</small></div>
+        <div class="user-area">
+            <span class="role-tag">學生</span>
+            <span id="userInfo">...</span>
+            <button class="btn secondary sm" onclick="logout()">登出</button>
+        </div>
+    </header>
+
+    <div class="layout">
+        <nav class="sidebar">
+            <div class="side-title">選課與學業</div>
+            <a class="active" data-view="schedule">我的課表</a>
+            <a data-view="courses">選課作業</a>
+            <a data-view="grades">成績與學分</a>
+            <a data-view="attendance">出缺勤查詢</a>
+            <a data-view="materials">課程教材</a>
+            <div class="side-title">校園資訊</div>
+            <a data-view="announcements">校園公告</a>
+        </nav>
+
+        <main class="content">
+            <div id="message"></div>
+            <h1 class="page-title" id="pageTitle">我的課表</h1>
+
+            <div id="scheduleView">
+                <div class="block">
+                    <div class="block-header">本學期課表 <span id="scheduleSummary" class="muted" style="float:right;font-weight:normal"></span></div>
+                    <div class="block-body">
+                        <table class="timetable">
+                            <thead>
+                                <tr>
+                                    <th>節次</th><th>星期一</th><th>星期二</th><th>星期三</th><th>星期四</th><th>星期五</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="coursesView" class="hidden">
+                <div class="block">
+                    <div class="block-header">
+                        可選課程
+                        <span id="windowBadge" class="tag" style="float:right"></span>
+                    </div>
+                    <div class="block-body">
+                        <div class="form-inline" style="margin-bottom:12px">
+                            <div class="form-row"><label>關鍵字</label><input type="text" id="fQ" placeholder="課號／課名／教師／簡介" style="width:180px"></div>
+                            <div class="form-row"><label>系所</label><select id="fDept" style="width:130px"></select></div>
+                            <div class="form-row"><label>星期</label>
+                                <select id="fDay" style="width:75px">
+                                    <option value="">全部</option>
+                                    <option value="1">一</option><option value="2">二</option><option value="3">三</option>
+                                    <option value="4">四</option><option value="5">五</option>
+                                </select>
+                            </div>
+                            <div class="form-row"><label>節次</label><select id="fPeriod" style="width:75px"></select></div>
+                            <div class="form-row"><label>&nbsp;</label><button class="btn" onclick="loadCourses()">查詢</button></div>
+                            <div class="form-row"><label>&nbsp;</label><button class="btn secondary" onclick="clearFilters()">清除</button></div>
+                        </div>
+                        <div class="summary muted" id="courseSummary" style="margin-bottom:10px"></div>
+                        <table class="data" id="courseTable">
+                            <thead>
+                                <tr>
+                                    <th>課號</th><th>課程名稱</th><th>系所</th><th>授課教師</th><th>上課時間</th><th>教室</th><th class="center">學分</th><th class="center">餘額</th><th class="center">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="gradesView" class="hidden">
+                <div class="stat-grid">
+                    <div class="stat"><div class="num" id="gpaNum">-</div><div class="label">GPA（加權平均績點）</div></div>
+                    <div class="stat"><div class="num" id="earnedNum">0</div><div class="label">已修得學分</div></div>
+                    <div class="stat"><div class="num" id="gradNum">128</div><div class="label">畢業要求學分</div></div>
+                    <div class="stat"><div class="num" id="gradedNum">0</div><div class="label">已有成績學分</div></div>
+                </div>
+
+                <div class="block">
+                    <div class="block-header">畢業學分進度</div>
+                    <div class="block-body">
+                        <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%">0%</div></div>
+                        <div class="muted" id="progressText"></div>
+                    </div>
+                </div>
+
+                <div class="block">
+                    <div class="block-header">
+                        課程成績
+                        <button class="btn secondary sm" style="float:right" onclick="exportGrades()">匯出成績單 CSV</button>
+                    </div>
+                    <div class="block-body">
+                        <table class="data" id="gradeTable">
+                            <thead>
+                                <tr>
+                                    <th>課號</th><th>課程名稱</th><th class="center">學分</th>
+                                    <th class="center">平時(30%)</th><th class="center">期中(30%)</th><th class="center">期末(40%)</th>
+                                    <th class="center">總成績</th><th class="center">績點</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="materialsView" class="hidden">
+                <div class="block">
+                    <div class="block-header">課程教材</div>
+                    <div class="block-body">
+                        <div class="muted" style="margin-bottom:10px">由授課教師上傳，僅限選修該課程之學生下載。</div>
+                        <table class="data" id="materialTable">
+                            <thead>
+                                <tr><th>課程</th><th>檔案名稱</th><th class="center">大小</th><th>上傳時間</th><th class="center">下載</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="attendanceView" class="hidden">
+                <div class="block">
+                    <div class="block-header">各科出勤統計</div>
+                    <div class="block-body">
+                        <table class="data" id="attSummaryTable">
+                            <thead>
+                                <tr>
+                                    <th>課號</th><th>課程名稱</th><th class="center">點名次數</th>
+                                    <th class="center">出席</th><th class="center">遲到</th><th class="center">缺席</th><th class="center">請假</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="block">
+                    <div class="block-header">出缺勤明細</div>
+                    <div class="block-body">
+                        <table class="data" id="attRecordTable">
+                            <thead>
+                                <tr><th>日期</th><th>課號</th><th>課程名稱</th><th class="center">狀態</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="announcementsView" class="hidden">
+                <div class="block">
+                    <div class="block-header">校園公告</div>
+                    <div class="block-body">
+                        <table class="data" id="announceTable">
+                            <thead>
+                                <tr><th>發布日期</th><th>標題與內容</th><th class="center">對象</th><th>發布人</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const DAYS = ['一', '二', '三', '四', '五'];
+        const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        const TITLES = {
+            schedule: '我的課表', courses: '選課作業', grades: '成績與學分',
+            materials: '課程教材', attendance: '出缺勤查詢', announcements: '校園公告'
+        };
+        const VIEWS = ['schedule', 'courses', 'grades', 'materials', 'attendance', 'announcements'];
+        const AUD_NAME = { all: '全體', student: '學生', teacher: '教師', admin: '管理員' };
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+        if (!token) window.location.href = '/';
+        if (user && user.role !== 'student') {
+            window.location.href = user.role === 'admin' ? '/admin.html' : '/teacher.html';
+        }
+
+        function headers() {
+            return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+        }
+
+        function msg(text, ok = true) {
+            const el = document.getElementById('message');
+            el.textContent = text || '';
+            el.style.color = ok ? '#1e7a45' : '#a92c2c';
+            if (text) setTimeout(() => { el.textContent = ''; }, 4000);
+        }
+
+        function showTab(name) {
+            VIEWS.forEach((n) => {
+                document.getElementById(n + 'View').classList.toggle('hidden', n !== name);
+            });
+            document.querySelectorAll('.sidebar a').forEach((a) => {
+                a.classList.toggle('active', a.dataset.view === name);
+            });
+            document.getElementById('pageTitle').textContent = TITLES[name];
+            if (name === 'grades') loadGrades();
+            if (name === 'materials') loadMaterials();
+            if (name === 'attendance') loadAttendance();
+            if (name === 'announcements') loadAnnouncements();
+        }
+
+        document.querySelectorAll('.sidebar a').forEach((a) => {
+            a.addEventListener('click', () => showTab(a.dataset.view));
+        });
+
+        function fmtSize(n) {
+            if (n < 1024) return n + ' B';
+            if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+            return (n / 1024 / 1024).toFixed(1) + ' MB';
+        }
+
+        async function loadAll() {
+            if (user) {
+                document.getElementById('userInfo').textContent =
+                    `${user.name}（${user.studentId}／${user.dept}）`;
+            }
+            await Promise.all([loadSchedule(), loadCourses()]);
+        }
+
+        function buildFilterQuery() {
+            const p = new URLSearchParams();
+            const q = document.getElementById('fQ').value.trim();
+            const dep = document.getElementById('fDept').value;
+            const day = document.getElementById('fDay').value;
+            const per = document.getElementById('fPeriod').value;
+            if (q) p.set('q', q);
+            if (dep) p.set('department', dep);
+            if (day) p.set('weekday', day);
+            if (per) p.set('period', per);
+            const s = p.toString();
+            return s ? '?' + s : '';
+        }
+
+        function clearFilters() {
+            ['fQ', 'fDept', 'fDay', 'fPeriod'].forEach((id) => document.getElementById(id).value = '');
+            loadCourses();
+        }
+
+        async function loadCourses() {
+            const res = await fetch('/api/courses' + buildFilterQuery(), { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+
+            const depSel = document.getElementById('fDept');
+            if (!depSel.options.length) {
+                depSel.innerHTML = '<option value="">全部</option>' +
+                    data.departments.map((d) => `<option value="${d}">${d}</option>`).join('');
+            }
+            const perSel = document.getElementById('fPeriod');
+            if (!perSel.options.length) {
+                perSel.innerHTML = '<option value="">全部</option>' +
+                    PERIODS.map((p) => `<option value="${p}">${p}</option>`).join('');
+            }
+
+            const badge = document.getElementById('windowBadge');
+            badge.textContent = data.window.message;
+            badge.className = 'tag ' + (data.window.open ? 'green' : 'red');
+
+            document.querySelector('#courseTable tbody').innerHTML = data.courses.map((c) => {
+                const time = `週${DAYS[c.weekday - 1]} ${c.start_period}-${c.end_period} 節`;
+                const seat = c.remaining > 0
+                    ? `${c.remaining} / ${c.capacity}`
+                    : `<span class="fail">${c.capacity}（額滿）</span>`;
+                const btn = c.selected
+                    ? `<button class="btn danger sm" onclick="dropCourse(${c.id})">退選</button>`
+                    : `<button class="btn success sm" onclick="enroll(${c.id})" ${c.remaining <= 0 || !data.window.open ? 'disabled' : ''}>選課</button>`;
+                const tag = c.selected ? ' <span class="tag green">已選</span>' : '';
+                const desc = c.description ? `<div class="muted" style="font-size:12px">${c.description}</div>` : '';
+                return `<tr>
+                    <td>${c.course_no}</td>
+                    <td>${c.name}${tag}${desc}</td>
+                    <td>${c.department || '-'}</td>
+                    <td>${c.teacher_name || c.teacher || '-'}</td>
+                    <td>${time}</td>
+                    <td>${c.classroom}</td>
+                    <td class="center">${c.credit}</td>
+                    <td class="center">${seat}</td>
+                    <td class="center">${btn}</td>
+                </tr>`;
+            }).join('') || '<tr><td colspan="9" class="center muted">沒有符合條件的課程</td></tr>';
+
+            document.getElementById('courseSummary').textContent =
+                `符合 ${data.courses.length} 門課程，已選 ${data.selectedCount} 門（合計 ${data.totalCredits} 學分）`;
+        }
+
+        async function loadSchedule() {
+            const res = await fetch('/api/schedule', { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+            const courses = data.courses || [];
+
+            const grid = {};
+            for (const c of courses) {
+                for (let p = c.start_period; p <= c.end_period; p++) grid[p + '-' + c.weekday] = c;
+            }
+
+            document.querySelector('.timetable tbody').innerHTML = PERIODS.map((p) => {
+                const cells = [1, 2, 3, 4, 5].map((d) => {
+                    const c = grid[p + '-' + d];
+                    if (!c || c.start_period !== p) return '<td></td>';
+                    const span = c.end_period - c.start_period + 1;
+                    return `<td rowspan="${span}"><div class="course-cell"><b>${c.name}</b>${c.course_no}<small>${c.teacher}・${c.classroom}</small></div></td>`;
+                }).join('');
+                return `<tr><td class="period">${p} 節</td>${cells}</tr>`;
+            }).join('');
+
+            const credits = courses.reduce((s, c) => s + (c.credit || 0), 0);
+            document.getElementById('scheduleSummary').textContent =
+                `已選 ${courses.length} 門課，共 ${credits} 學分`;
+        }
+
+        async function loadGrades() {
+            const res = await fetch('/api/grades/summary', { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+
+            document.getElementById('gpaNum').textContent = data.summary.gpa ?? '-';
+            document.getElementById('earnedNum').textContent = data.summary.earnedCredits;
+            document.getElementById('gradNum').textContent = data.summary.gradCredits;
+            document.getElementById('gradedNum').textContent = data.summary.gradedCredits;
+            const bar = document.getElementById('progressBar');
+            bar.style.width = data.summary.progress + '%';
+            bar.textContent = data.summary.progress + '%';
+            document.getElementById('progressText').textContent =
+                `已修得 ${data.summary.earnedCredits} 學分 / 畢業要求 ${data.summary.gradCredits} 學分`;
+
+            document.querySelector('#gradeTable tbody').innerHTML = data.courses.map((c) => {
+                if (!c.published) {
+                    return `<tr>
+                        <td>${c.course_no}</td><td>${c.name}</td><td class="center">${c.credit}</td>
+                        <td colspan="5" class="center muted">成績未發布</td>
+                    </tr>`;
+                }
+                const cls = c.total >= 60 ? 'pass' : 'fail';
+                return `<tr>
+                    <td>${c.course_no}</td>
+                    <td>${c.name}</td>
+                    <td class="center">${c.credit}</td>
+                    <td class="center">${c.participation}</td>
+                    <td class="center">${c.midterm}</td>
+                    <td class="center">${c.final}</td>
+                    <td class="center ${cls}">${c.total}</td>
+                    <td class="center">${c.gradePoint}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function loadMaterials() {
+            const res = await fetch('/api/my/materials', { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+            document.querySelector('#materialTable tbody').innerHTML = data.materials.length
+                ? data.materials.map((m) => `<tr>
+                    <td>${m.course_name}（${m.course_no}）</td>
+                    <td>${m.filename}</td>
+                    <td class="center">${fmtSize(m.size)}</td>
+                    <td>${new Date(m.uploaded_at).toLocaleString('zh-TW')}</td>
+                    <td class="center"><a class="link" href="#" onclick="return downloadMaterial(event, ${m.id})">下載</a></td>
+                </tr>`).join('')
+                : '<tr><td colspan="5" class="center muted">尚無教材</td></tr>';
+        }
+
+        async function downloadMaterial(e, id) {
+            e.preventDefault();
+            const res = await fetch('/api/materials/' + id + '/download', { headers: { Authorization: 'Bearer ' + token } });
+            if (!res.ok) {
+                const d = await res.json().catch(() => ({}));
+                msg(d.message || '下載失敗', false);
+                return false;
+            }
+            const blob = await res.blob();
+            const cd = res.headers.get('content-disposition') || '';
+            const match = cd.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
+            const name = match ? decodeURIComponent(match[1]) : 'download';
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = name;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            return false;
+        }
+
+        async function loadAttendance() {
+            const res = await fetch('/api/my/attendance', { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+
+            document.querySelector('#attSummaryTable tbody').innerHTML = data.summary.map((s) => `<tr>
+                <td>${s.course_no}</td>
+                <td>${s.course_name}</td>
+                <td class="center">${s.total}</td>
+                <td class="center">${s.present}</td>
+                <td class="center">${s.late}</td>
+                <td class="center ${s.absent ? 'fail' : ''}">${s.absent}</td>
+                <td class="center">${s.leave}</td>
+            </tr>`).join('') || '<tr><td colspan="7" class="center muted">尚無點名紀錄</td></tr>';
+
+            document.querySelector('#attRecordTable tbody').innerHTML = data.records.map((r) => {
+                const cls = r.status === 'absent' ? 'fail' : r.status === 'late' ? 'gold' : 'green';
+                return `<tr>
+                    <td>${r.date}</td>
+                    <td>${r.course_no}</td>
+                    <td>${r.course_name}</td>
+                    <td class="center"><span class="tag ${cls}">${r.statusText}</span></td>
+                </tr>`;
+            }).join('') || '<tr><td colspan="4" class="center muted">尚無出缺勤紀錄</td></tr>';
+        }
+
+        async function loadAnnouncements() {
+            const res = await fetch('/api/announcements', { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+            document.querySelector('#announceTable tbody').innerHTML = data.announcements.map((a) => `<tr>
+                <td style="white-space:nowrap">${new Date(a.created_at).toLocaleDateString('zh-TW')}</td>
+                <td><b>${a.title}</b><div style="margin-top:4px;white-space:pre-wrap">${a.content}</div></td>
+                <td class="center"><span class="tag ${a.audience === 'all' ? 'green' : 'gold'}">${AUD_NAME[a.audience] || a.audience}</span></td>
+                <td>${a.author || '-'}</td>
+            </tr>`).join('') || '<tr><td colspan="4" class="center muted">尚無公告</td></tr>';
+        }
+
+        async function exportGrades() {
+            const res = await fetch('/api/grades/export.csv', { headers: { Authorization: 'Bearer ' + token } });
+            if (!res.ok) {
+                const d = await res.json().catch(() => ({}));
+                return msg(d.message || '匯出失敗', false);
+            }
+            downloadBlob(res, '成績單.csv');
+        }
+
+        async function downloadBlob(res, fallback) {
+            const blob = await res.blob();
+            const cd = res.headers.get('content-disposition') || '';
+            const match = cd.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
+            const name = match ? decodeURIComponent(match[1]) : fallback;
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = name;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        async function enroll(id) {
+            const res = await fetch('/api/courses/' + id + '/enroll', { method: 'POST', headers: headers() });
+            const data = await res.json();
+            msg(data.message, data.success);
+            if (data.success) await loadAll();
+        }
+
+        async function dropCourse(id) {
+            const res = await fetch('/api/courses/' + id + '/enroll', { method: 'DELETE', headers: headers() });
+            const data = await res.json();
+            msg(data.message, data.success);
+            if (data.success) await loadAll();
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST', headers: headers() }).catch(() => {});
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+
+        loadAll();
+    </script>
+</body>
+</html>

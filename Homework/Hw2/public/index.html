@@ -2,29 +2,34 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>NQU 系統登入</title>
-    <style>
-        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center; border-top: 5px solid #0056b3; }
-        .form-group { text-align: left; margin-bottom: 15px; }
-        input { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #0056b3; color: white; border: none; cursor: pointer; font-size: 16px; }
-        #message { margin-top: 15px; font-size: 14px; }
-    </style>
+    <title>教務系統登入 - NQU</title>
+    <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-    <div class="login-card">
-        <h2>NQU 登入系統</h2>
-        <div class="form-group">
-            <label>學號</label>
-            <input type="text" id="studentId" placeholder="請輸入學號">
+<body class="login-page">
+    <div class="login-box">
+        <div class="login-head">
+            <h2>NQU 校務資訊系統</h2>
+            <p>請使用學號／教職員帳號登入</p>
         </div>
-        <div class="form-group">
-            <label>密碼</label>
-            <input type="password" id="password" placeholder="請輸入密碼">
+        <div class="login-body">
+            <div class="form-row">
+                <label for="studentId">帳號（學號／教職員編號）</label>
+                <input type="text" id="studentId" placeholder="請輸入帳號" autocomplete="username">
+            </div>
+            <div class="form-row">
+                <label for="password">密碼</label>
+                <input type="password" id="password" placeholder="請輸入密碼" autocomplete="current-password">
+            </div>
+            <button class="btn" onclick="doLogin()">登　入</button>
+            <div class="login-msg" id="message"></div>
+            <div class="login-note">
+                測試帳號：<br>
+                學生（資工）123456 / 123456<br>
+                學生（資管）123457 / 123457<br>
+                教師　111111 / 111111（另有 111112～111114，密碼同帳號）<br>
+                管理員　admin / 123456
+            </div>
         </div>
-        <button onclick="doLogin()">登入</button>
-        <div id="message"></div>
     </div>
 
     <script>
@@ -39,18 +44,24 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ studentId, password })
                 });
-
                 const data = await response.json();
 
                 if (data.success) {
-                    msgDiv.style.color = "green";
+                    msgDiv.style.color = '#1e7a45';
                     msgDiv.innerText = data.message;
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    const home = data.user.role === 'admin' ? '/admin.html'
+                        : data.user.role === 'teacher' ? '/teacher.html'
+                        : '/dashboard.html';
+                    setTimeout(() => { window.location.href = home; }, 500);
                 } else {
-                    msgDiv.style.color = "red";
+                    msgDiv.style.color = '#a92c2c';
                     msgDiv.innerText = data.message;
                 }
             } catch (error) {
-                msgDiv.innerText = "無法連線到伺服器";
+                msgDiv.style.color = '#a92c2c';
+                msgDiv.innerText = '無法連線到伺服器';
             }
         }
 

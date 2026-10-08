@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>教師端 - NQU 校務資訊系統</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand">NQU 校務資訊系統<small>教師端</small></div>
+        <div class="user-area">
+            <span class="role-tag">教師</span>
+            <span id="userInfo">...</span>
+            <button class="btn secondary sm" onclick="logout()">登出</button>
+        </div>
+    </header>
+
+    <div class="layout">
+        <nav class="sidebar">
+            <div class="side-title">教學管理</div>
+            <a class="active" data-view="courses">我的課程</a>
+            <a data-view="attendance">點名系統</a>
+            <a data-view="grades">成績輸入</a>
+            <a data-view="materials">教材管理</a>
+            <div class="side-title">校園資訊</div>
+            <a data-view="announcements">校園公告</a>
+        </nav>
+
+        <main class="content">
+            <div id="message"></div>
+            <h1 class="page-title" id="pageTitle">我的課程</h1>
+
+            <div id="coursesView">
+                <div class="block">
+                    <div class="block-header">本學期授課清單</div>
+                    <div class="block-body">
+                        <table class="data" id="courseTable">
+                            <thead>
+                                <tr>
+                                    <th>課號</th><th>課程名稱</th><th>上課時間</th><th>教室</th>
+                                    <th class="center">學分</th><th class="center">選課人數</th><th class="center">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="workspaceView" class="hidden">
+                <div class="block">
+                    <div class="block-header">
+                        目標課程
+                        <span style="float:right;font-weight:normal">
+                            <select id="courseSelect" style="width:auto;display:inline-block" onchange="switchCourse()"></select>
+                        </span>
+                    </div>
+                    <div class="block-body">
+                        <div class="pill-nav">
+                            <button class="active" data-pane="attendance">點名</button>
+                            <button data-pane="grades">成績</button>
+                            <button data-pane="materials">教材</button>
+                        </div>
+
+                        <div id="attendancePane">
+                            <div class="form-inline" style="margin-bottom:14px">
+                                <div class="form-row">
+                                    <label>點名日期</label>
+                                    <input type="date" id="attDate">
+                                </div>
+                                <button class="btn secondary" onclick="loadRoster()">查詢</button>
+                                <button class="btn" onclick="saveAttendance()">儲存點名</button>
+                            </div>
+                            <table class="data" id="rosterTable">
+                                <thead>
+                                    <tr>
+                                        <th class="center">學號</th><th>姓名</th><th>系所</th><th class="center">出勤狀態</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <div id="gradesPane" class="hidden">
+                            <div class="muted" style="margin-bottom:10px">
+                                總成績 = 平時 × 30% + 期中 × 30% + 期末 × 40%；成績一經修改將回復為「未發布」，須重新發布。
+                            </div>
+                            <div class="form-inline" style="margin-bottom:14px">
+                                <button class="btn" onclick="saveGrades()">儲存成績</button>
+                                <button class="btn success" onclick="publishGrades()">批次發布成績</button>
+                                <button class="btn secondary" onclick="exportGrades()">匯出成績 CSV</button>
+                            </div>
+                            <table class="data" id="gradeInputTable">
+                                <thead>
+                                    <tr>
+                                        <th class="center">學號</th><th>姓名</th>
+                                        <th class="center">平時</th><th class="center">期中</th><th class="center">期末</th>
+                                        <th class="center">總成績</th><th class="center">狀態</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <div id="materialsPane" class="hidden">
+                            <div class="form-inline" style="margin-bottom:14px">
+                                <div class="form-row" style="flex:1">
+                                    <label>上傳教材檔案（課程檔案下載）</label>
+                                    <input type="file" id="materialFile">
+                                </div>
+                                <button class="btn" onclick="uploadMaterial()">上傳</button>
+                            </div>
+                            <table class="data" id="materialTable">
+                                <thead>
+                                    <tr><th>檔案名稱</th><th class="center">大小</th><th>上傳時間</th><th class="center">操作</th></tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="announcementsView" class="hidden">
+                <div class="block">
+                    <div class="block-header">校園公告</div>
+                    <div class="block-body">
+                        <table class="data" id="announceTable">
+                            <thead>
+                                <tr><th>發布日期</th><th>標題與內容</th><th class="center">對象</th><th>發布人</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const TITLES = { courses: '我的課程', attendance: '點名系統', grades: '成績輸入', materials: '教材管理', announcements: '校園公告' };
+        const AUD_NAME = { all: '全體', student: '學生', teacher: '教師', admin: '管理員' };
+        const DAYS = ['一', '二', '三', '四', '五'];
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+        if (!token) window.location.href = '/';
+        if (user && user.role !== 'teacher' && user.role !== 'admin') window.location.href = '/dashboard.html';
+
+        let courses = [];
+        let currentId = null;
+
+        function headers() {
+            return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+        }
+
+        function msg(text, ok = true) {
+            const el = document.getElementById('message');
+            el.textContent = text || '';
+            el.style.color = ok ? '#1e7a45' : '#a92c2c';
+            if (text) setTimeout(() => { el.textContent = ''; }, 4000);
+        }
+
+        function fmtSize(n) {
+            if (n < 1024) return n + ' B';
+            if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+            return (n / 1024 / 1024).toFixed(1) + ' MB';
+        }
+
+        function timeText(c) {
+            return `週${DAYS[c.weekday - 1]} ${c.start_period}-${c.end_period} 節`;
+        }
+
+        function showView(name) {
+            document.getElementById('coursesView').classList.toggle('hidden', name !== 'courses');
+            document.getElementById('announcementsView').classList.toggle('hidden', name !== 'announcements');
+            document.getElementById('workspaceView').classList.toggle('hidden', name === 'courses' || name === 'announcements');
+            document.querySelectorAll('.sidebar a').forEach((a) => {
+                a.classList.toggle('active', a.dataset.view === name);
+            });
+            document.getElementById('pageTitle').textContent = TITLES[name];
+            if (name === 'announcements') return loadAnnouncements();
+            if (name !== 'courses') showPane(name);
+        }
+
+        function showPane(name) {
+            ['attendance', 'grades', 'materials'].forEach((n) => {
+                document.getElementById(n + 'Pane').classList.toggle('hidden', n !== name);
+            });
+            document.querySelectorAll('.pill-nav button').forEach((b) => {
+                b.classList.toggle('active', b.dataset.pane === name);
+            });
+            document.querySelectorAll('.sidebar a').forEach((a) => {
+                a.classList.toggle('active', a.dataset.view === name);
+            });
+            document.getElementById('pageTitle').textContent = TITLES[name];
+            if (name === 'attendance') loadRoster();
+            if (name === 'grades') loadRoster();
+            if (name === 'materials') loadMaterials();
+        }
+
+        document.querySelectorAll('.sidebar a').forEach((a) => {
+            a.addEventListener('click', () => showView(a.dataset.view));
+        });
+        document.querySelectorAll('.pill-nav button').forEach((b) => {
+            b.addEventListener('click', () => showPane(b.dataset.pane));
+        });
+
+        async function loadCourses() {
+            const res = await fetch('/api/teacher/courses', { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+            courses = data.courses;
+
+            document.querySelector('#courseTable tbody').innerHTML = courses.map((c) => `<tr>
+                <td>${c.course_no}</td>
+                <td>${c.name}</td>
+                <td>${timeText(c)}</td>
+                <td>${c.classroom}</td>
+                <td class="center">${c.credit}</td>
+                <td class="center">${c.enrolled} / ${c.capacity}</td>
+                <td class="center"><button class="btn sm" onclick="openCourse(${c.id})">管理</button></td>
+            </tr>`).join('') || '<tr><td colspan="7" class="center muted">目前沒有授課課程</td></tr>';
+
+            const sel = document.getElementById('courseSelect');
+            sel.innerHTML = courses.map((c) => `<option value="${c.id}">${c.course_no} ${c.name}</option>`).join('');
+            if (!currentId && courses.length) currentId = courses[0].id;
+            sel.value = currentId;
+        }
+
+        function openCourse(id) {
+            currentId = id;
+            document.getElementById('courseSelect').value = id;
+            showView('attendance');
+        }
+
+        function switchCourse() {
+            currentId = Number(document.getElementById('courseSelect').value);
+            const pane = document.querySelector('.pill-nav button.active').dataset.pane;
+            showPane(pane);
+        }
+
+        async function loadRoster() {
+            if (!currentId) return;
+            const date = document.getElementById('attDate').value;
+            const res = await fetch(`/api/teacher/courses/${currentId}/roster${date ? '?date=' + date : ''}`, { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+            if (!data.success) return msg(data.message, false);
+
+            document.querySelector('#rosterTable tbody').innerHTML = data.roster.map((s) => `<tr>
+                <td class="center">${s.student_id}</td>
+                <td>${s.name}</td>
+                <td>${s.department}</td>
+                <td class="center">
+                    <select data-user="${s.id}" class="att-select" style="width:auto">
+                        <option value="" ${!s.attendance ? 'selected' : ''}>未點名</option>
+                        <option value="present" ${s.attendance === 'present' ? 'selected' : ''}>出席</option>
+                        <option value="late" ${s.attendance === 'late' ? 'selected' : ''}>遲到</option>
+                        <option value="absent" ${s.attendance === 'absent' ? 'selected' : ''}>缺席</option>
+                        <option value="leave" ${s.attendance === 'leave' ? 'selected' : ''}>請假</option>
+                    </select>
+                </td>
+            </tr>`).join('') || '<tr><td colspan="4" class="center muted">尚無學生選修此課程</td></tr>';
+
+            document.querySelector('#gradeInputTable tbody').innerHTML = data.roster.map((s) => {
+                const g = s.grade || {};
+                const total = g.total ?? '';
+                const status = g
+                    ? (g.published ? '<span class="tag green">已發布</span>' : '<span class="tag gold">未發布</span>')
+                    : '<span class="tag">未輸入</span>';
+                return `<tr>
+                    <td class="center">${s.student_id}</td>
+                    <td>${s.name}</td>
+                    <td class="center"><input type="number" min="0" max="100" step="1" style="width:75px;text-align:center" data-user="${s.id}" data-field="participation" value="${g.participation ?? ''}"></td>
+                    <td class="center"><input type="number" min="0" max="100" step="1" style="width:75px;text-align:center" data-user="${s.id}" data-field="midterm" value="${g.midterm ?? ''}"></td>
+                    <td class="center"><input type="number" min="0" max="100" step="1" style="width:75px;text-align:center" data-user="${s.id}" data-field="final" value="${g.final ?? ''}"></td>
+                    <td class="center"><b>${total}</b></td>
+                    <td class="center">${status}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function saveAttendance() {
+            const date = document.getElementById('attDate').value;
+            if (!date) return msg('請先選擇點名日期', false);
+            const records = [...document.querySelectorAll('.att-select')]
+                .filter((s) => s.value)
+                .map((s) => ({ user_id: Number(s.dataset.user), status: s.value }));
+            if (!records.length) return msg('請先設定出勤狀態', false);
+
+            const res = await fetch(`/api/teacher/courses/${currentId}/attendance`, {
+                method: 'POST', headers: headers(),
+                body: JSON.stringify({ date, records })
+            });
+            const data = await res.json();
+            msg(data.message, data.success);
+        }
+
+        async function saveGrades() {
+            const records = [...document.querySelectorAll('#gradeInputTable input')].reduce((acc, input) => {
+                const uid = Number(input.dataset.user);
+                let rec = acc.find((r) => r.user_id === uid);
+                if (!rec) { rec = { user_id: uid }; acc.push(rec); }
+                rec[input.dataset.field] = input.value === '' ? 0 : Number(input.value);
+                return acc;
+            }, []);
+            if (!records.length) return msg('沒有可儲存的成績', false);
+
+            const res = await fetch(`/api/teacher/courses/${currentId}/grades`, {
+                method: 'POST', headers: headers(),
+                body: JSON.stringify({ records })
+            });
+            const data = await res.json();
+            msg(data.message, data.success);
+            if (data.success) loadRoster();
+        }
+
+        async function publishGrades() {
+            const res = await fetch(`/api/teacher/courses/${currentId}/publish`, { method: 'POST', headers: headers() });
+            const data = await res.json();
+            msg(data.message, data.success);
+            if (data.success) loadRoster();
+        }
+
+        async function exportGrades() {
+            if (!currentId) return msg('請先選擇課程', false);
+            const res = await fetch(`/api/teacher/courses/${currentId}/export.csv`, { headers: { Authorization: 'Bearer ' + token } });
+            if (!res.ok) {
+                const d = await res.json().catch(() => ({}));
+                return msg(d.message || '匯出失敗', false);
+            }
+            const blob = await res.blob();
+            const cd = res.headers.get('content-disposition') || '';
+            const match = cd.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
+            const name = match ? decodeURIComponent(match[1]) : 'grades.csv';
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = name;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        async function loadAnnouncements() {
+            const res = await fetch('/api/announcements', { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+            document.querySelector('#announceTable tbody').innerHTML = data.announcements.map((a) => `<tr>
+                <td style="white-space:nowrap">${new Date(a.created_at).toLocaleDateString('zh-TW')}</td>
+                <td><b>${a.title}</b><div style="margin-top:4px;white-space:pre-wrap">${a.content}</div></td>
+                <td class="center"><span class="tag ${a.audience === 'all' ? 'green' : 'gold'}">${AUD_NAME[a.audience] || a.audience}</span></td>
+                <td>${a.author || '-'}</td>
+            </tr>`).join('') || '<tr><td colspan="4" class="center muted">尚無公告</td></tr>';
+        }
+
+        async function loadMaterials() {
+            if (!currentId) return;
+            const res = await fetch(`/api/teacher/courses/${currentId}/materials`, { headers: headers() });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+            document.querySelector('#materialTable tbody').innerHTML = data.materials.length
+                ? data.materials.map((m) => `<tr>
+                    <td>${m.filename}</td>
+                    <td class="center">${fmtSize(m.size)}</td>
+                    <td>${new Date(m.uploaded_at).toLocaleString('zh-TW')}</td>
+                    <td class="center">
+                        <a class="link" href="#" onclick="return downloadMaterial(event, ${m.id})">下載</a>
+                        &nbsp;|&nbsp;
+                        <a class="link" href="#" style="color:#a92c2c" onclick="return deleteMaterial(${m.id})">刪除</a>
+                    </td>
+                </tr>`).join('')
+                : '<tr><td colspan="4" class="center muted">尚無教材</td></tr>';
+        }
+
+        async function uploadMaterial() {
+            const fileInput = document.getElementById('materialFile');
+            if (!fileInput.files.length) return msg('請先選擇檔案', false);
+            const form = new FormData();
+            form.append('file', fileInput.files[0]);
+
+            const res = await fetch(`/api/teacher/courses/${currentId}/materials`, {
+                method: 'POST',
+                headers: { Authorization: 'Bearer ' + token },
+                body: form
+            });
+            const data = await res.json();
+            msg(data.message, data.success);
+            if (data.success) {
+                fileInput.value = '';
+                loadMaterials();
+            }
+        }
+
+        async function deleteMaterial(id) {
+            if (!confirm('確定要刪除這個檔案？')) return false;
+            const res = await fetch('/api/teacher/materials/' + id, { method: 'DELETE', headers: headers() });
+            const data = await res.json();
+            msg(data.message, data.success);
+            if (data.success) loadMaterials();
+            return false;
+        }
+
+        async function downloadMaterial(e, id) {
+            e.preventDefault();
+            const res = await fetch('/api/materials/' + id + '/download', { headers: { Authorization: 'Bearer ' + token } });
+            if (!res.ok) {
+                const d = await res.json().catch(() => ({}));
+                msg(d.message || '下載失敗', false);
+                return false;
+            }
+            const blob = await res.blob();
+            const cd = res.headers.get('content-disposition') || '';
+            const match = cd.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
+            const name = match ? decodeURIComponent(match[1]) : 'download';
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = name;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            return false;
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST', headers: headers() }).catch(() => {});
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+
+        document.getElementById('attDate').value = new Date().toISOString().slice(0, 10);
+        document.getElementById('userInfo').textContent = user ? `${user.name}（${user.studentId}／${user.dept}）` : '...';
+        loadCourses();
+    </script>
+</body>
+</html>
