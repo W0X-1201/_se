@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="330" viewBox="0 0 760 330" font-family="Microsoft JhengHei, Noto Sans TC, sans-serif">
+  <!-- portfolio 持倉資料表 -->
+  <rect x="180" y="40" width="400" height="46" rx="10" fill="#6366F1"/>
+  <text x="380" y="70" text-anchor="middle" fill="#fff" font-size="17" font-weight="bold">portfolio（持倉資料表）</text>
+
+  <rect x="180" y="86" width="400" height="190" rx="10" fill="#F8FAFC" stroke="#6366F1" stroke-width="2"/>
+
+  <line x1="180" y1="124" x2="580" y2="124" stroke="#E2E8F0"/>
+  <line x1="180" y1="162" x2="580" y2="162" stroke="#E2E8F0"/>
+  <line x1="180" y1="200" x2="580" y2="200" stroke="#E2E8F0"/>
+  <line x1="180" y1="238" x2="580" y2="238" stroke="#E2E8F0"/>
+
+  <text x="204" y="113" font-size="15.5" font-weight="bold" fill="#1E293B">id (PK)</text>
+  <text x="340" y="113" font-size="14.5" font-family="Consolas, monospace" fill="#64748B">INTEGER AUTOINCREMENT（流水號）</text>
+
+  <text x="204" y="151" font-size="15.5" font-weight="bold" fill="#1E293B">stock_symbol</text>
+  <text x="340" y="151" font-size="14.5" font-family="Consolas, monospace" fill="#64748B">TEXT NOT NULL（股票代碼）</text>
+
+  <text x="204" y="189" font-size="15.5" font-weight="bold" fill="#1E293B">shares</text>
+  <text x="340" y="189" font-size="14.5" font-family="Consolas, monospace" fill="#64748B">REAL NOT NULL CHECK (&gt; 0)</text>
+
+  <text x="204" y="227" font-size="15.5" font-weight="bold" fill="#1E293B">buy_price</text>
+  <text x="340" y="227" font-size="14.5" font-family="Consolas, monospace" fill="#64748B">REAL NOT NULL CHECK (&gt;= 0)</text>
+
+  <text x="204" y="265" font-size="15.5" font-weight="bold" fill="#1E293B">company_name</text>
+  <text x="340" y="265" font-size="14.5" font-family="Consolas, monospace" fill="#64748B">TEXT NOT NULL（公司名稱）</text>
+
+  <text x="380" y="310" text-anchor="middle" font-size="14" fill="#64748B">1 筆 = 1 檔持倉；股價、股息、回測與預測皆由外部資料即時取得，不落資料庫</text>
+</svg>

@@ -1,0 +1,17 @@
+{
+  "name": "omnistock-ai",
+  "version": "0.1.0",
+  "description": "OmniStock AI - Phase 1 asset management center (Express + SQLite + vanilla JS)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "sqlite3": "^6.0.1"
+  }
+}

@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniStock AI - 資產管理中心</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-mark">◉</span>
+            <span class="brand-name">OmniStock <em>AI</em></span>
+        </div>
+        <span class="phase-badge">Phase 1 · 資產管理中心</span>
+    </header>
+
+    <main class="container">
+        <section class="summary" id="summary">
+            <div class="summary-card">
+                <p class="summary-label">總資產市值（換算新台幣）</p>
+                <p class="summary-value" id="total-market-value">NT$ 0</p>
+            </div>
+            <div class="summary-card">
+                <p class="summary-label">總投入成本</p>
+                <p class="summary-value" id="total-cost">NT$ 0</p>
+            </div>
+            <div class="summary-card">
+                <p class="summary-label">總損益</p>
+                <p class="summary-value" id="total-pnl">NT$ 0</p>
+                <p class="summary-sub" id="total-pnl-percent">不含息 0.00%</p>
+                <p class="summary-sub" id="total-pnl-div">含息 0.00%</p>
+            </div>
+            <div class="summary-card">
+                <p class="summary-label">年度股息估計（近 12 個月）</p>
+                <p class="summary-value" id="total-dividend">NT$ 0</p>
+                <p class="summary-sub" id="total-dividend-percent">股息率 0.00%</p>
+            </div>
+            <div class="summary-card">
+                <p class="summary-label">持倉檔數</p>
+                <p class="summary-value" id="holding-count">0</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head">
+                <h2>新增股票持倉</h2>
+            </div>
+            <form id="holding-form" class="holding-form" autocomplete="off">
+                <div class="field">
+                    <label for="stock_symbol">股票代碼</label>
+                    <input type="text" id="stock_symbol" name="stock_symbol" placeholder="2330" list="symbol-list" required>
+                    <datalist id="symbol-list"></datalist>
+                    <span class="field-hint" id="symbol-hint" hidden></span>
+                </div>
+                <div class="field">
+                    <label for="company_name">公司名稱</label>
+                    <input type="text" id="company_name" name="company_name" placeholder="自動帶入或手動輸入" required>
+                    <span class="field-hint" id="auto-hint" hidden>已自動帶入</span>
+                </div>
+                <div class="field">
+                    <label for="shares">持有股數</label>
+                    <input type="number" id="shares" name="shares" min="1" step="1" placeholder="1000" required>
+                </div>
+                <div class="field">
+                    <label for="buy_price">買入均價</label>
+                    <input type="number" id="buy_price" name="buy_price" min="0" step="0.01" placeholder="1050.5" required>
+                </div>
+                <button type="submit" class="btn-primary">新增持倉</button>
+            </form>
+            <p class="form-message" id="form-message" hidden></p>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head">
+                <h2>目前持倉</h2>
+                <span class="panel-hint">價格來自 Yahoo Finance 真實報價（可能有延遲），市值已換算新台幣</span>
+            </div>
+            <div class="table-wrap">
+                <table class="portfolio-table">
+                    <thead>
+                        <tr>
+                            <th>代碼</th>
+                            <th>公司名稱</th>
+                            <th class="num">股數</th>
+                            <th class="num">成本價</th>
+                            <th class="num">目前價</th>
+                            <th class="num">投入成本</th>
+                            <th class="num">市值</th>
+                            <th class="num">損益（不含息／含息）</th>
+                            <th class="num">股息（近 12 月）</th>
+                            <th>AI 情感雷達</th>
+                        </tr>
+                    </thead>
+                    <tbody id="portfolio-body"></tbody>
+                </table>
+                <p class="empty" id="empty-state" hidden>尚無持倉，請先於上方新增一筆股票。</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head">
+                <h2>🛒 每日必買</h2>
+                <span class="panel-hint" id="picks-hint">依價格動能分數排序（Yahoo 真實股價）</span>
+            </div>
+            <div class="table-wrap">
+                <table class="portfolio-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>代碼</th>
+                            <th>公司名稱</th>
+                            <th class="num">動能分數</th>
+                            <th class="num">近 5 日</th>
+                            <th class="num">目前價</th>
+                            <th>帶入下單</th>
+                        </tr>
+                    </thead>
+                    <tbody id="picks-body"></tbody>
+                </table>
+                <p class="empty" id="picks-empty">每日掃描中，約需 5～10 秒…</p>
+            </div>
+        </section>
+
+        <section class="chart-container panel" style="width: 100%;">
+            <div class="chart-head">
+                <h3>📈 策略回測收益曲線（真實股價）</h3>
+                <div class="range-picker" id="range-picker">
+                    <button type="button" class="range-btn active" data-range="30d">30 天</button>
+                    <button type="button" class="range-btn" data-range="1y">1 年</button>
+                    <button type="button" class="range-btn" data-range="3y">3 年</button>
+                    <button type="button" class="range-btn" data-range="10y">10 年</button>
+                    <button type="button" class="range-btn" data-range="20y">20 年</button>
+                    <button type="button" class="range-btn" data-range="30y">30 年</button>
+                </div>
+            </div>
+            <canvas id="backtestChart"></canvas>
+            <div id="resultSummary" class="chart-summary"></div>
+        </section>
+
+        <section class="chart-container panel" style="width: 100%;">
+            <div class="chart-head">
+                <h3>🔮 未來走勢預測（蒙地卡羅模擬，400 次情境）</h3>
+                <div class="range-picker" id="horizon-picker">
+                    <button type="button" class="range-btn" data-horizon="30d">30 天</button>
+                    <button type="button" class="range-btn active" data-horizon="90d">90 天</button>
+                    <button type="button" class="range-btn" data-horizon="180d">6 個月</button>
+                    <button type="button" class="range-btn" data-horizon="1y">1 年</button>
+                </div>
+            </div>
+            <canvas id="forecastChart"></canvas>
+            <div id="forecastSummary" class="chart-summary"></div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

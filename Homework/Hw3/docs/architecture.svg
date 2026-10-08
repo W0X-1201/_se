@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560" font-family="Microsoft JhengHei, Noto Sans TC, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#64748B"/>
+    </marker>
+  </defs>
+
+  <!-- 前端 -->
+  <rect x="30" y="60" width="300" height="440" rx="12" fill="#EEF2FF" stroke="#6366F1" stroke-width="2"/>
+  <rect x="30" y="60" width="300" height="46" rx="12" fill="#6366F1"/>
+  <rect x="30" y="90" width="300" height="16" fill="#6366F1"/>
+  <text x="180" y="90" text-anchor="middle" fill="#fff" font-size="17" font-weight="bold">瀏覽器前端（vanilla JS）</text>
+  <text x="52" y="140" font-size="15.5" fill="#1E293B">• 資產總覽（含息／不含息）</text>
+  <text x="52" y="178" font-size="15.5" fill="#1E293B">• 持倉新增／刪除、股息紀錄</text>
+  <text x="52" y="216" font-size="15.5" fill="#1E293B">• 每日必買清單（一鍵帶入表單）</text>
+  <text x="52" y="254" font-size="15.5" fill="#1E293B">• 策略回測儀表板（指標晶片）</text>
+  <text x="52" y="292" font-size="15.5" fill="#1E293B">• 蒙地卡羅未來預測圖</text>
+  <text x="52" y="330" font-size="15.5" fill="#1E293B">• AI 分析卡片（評級＋細節）</text>
+  <text x="52" y="368" font-size="15.5" fill="#1E293B">• 相關新聞面板</text>
+  <text x="52" y="406" font-size="15.5" fill="#1E293B">• Chart.js 圖表（CDN）</text>
+  <text x="180" y="470" text-anchor="middle" font-size="14" fill="#6366F1">index.html / app.js / style.css</text>
+
+  <!-- 後端 -->
+  <rect x="420" y="60" width="300" height="440" rx="12" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/>
+  <rect x="420" y="60" width="300" height="46" rx="12" fill="#059669"/>
+  <rect x="420" y="90" width="300" height="16" fill="#059669"/>
+  <text x="570" y="90" text-anchor="middle" fill="#fff" font-size="17" font-weight="bold">Express 後端（server.js）</text>
+  <text x="442" y="140" font-size="15.5" fill="#1E293B">• REST API（JSON）</text>
+  <text x="442" y="178" font-size="15.5" fill="#1E293B">• 動能分數 momentumScore</text>
+  <text x="442" y="216" font-size="15.5" fill="#1E293B">• 歷史回測引擎（勝率／MDD）</text>
+  <text x="442" y="254" font-size="15.5" fill="#1E293B">• 蒙地卡羅預測模擬（400 條）</text>
+  <text x="442" y="292" font-size="15.5" fill="#1E293B">• 情緒評級 ＋ 新聞聚合</text>
+  <text x="442" y="330" font-size="15.5" fill="#1E293B">• 有限度併發 · 10 分鐘快取</text>
+  <text x="442" y="368" font-size="15.5" fill="#1E293B">• 台股 .TW／.TWO 代碼轉換</text>
+  <text x="570" y="470" text-anchor="middle" font-size="14" fill="#059669">Node.js · Express 5 · Port 3100</text>
+
+  <!-- 外部來源 -->
+  <rect x="800" y="60" width="170" height="120" rx="12" fill="#FFF7ED" stroke="#F59E0B" stroke-width="2"/>
+  <text x="885" y="92" text-anchor="middle" font-size="16" font-weight="bold" fill="#B45309">Yahoo Finance</text>
+  <text x="885" y="122" text-anchor="middle" font-size="14.5" fill="#1E293B">即時報價 · 日線歷史</text>
+  <text x="885" y="148" text-anchor="middle" font-size="14.5" fill="#1E293B">除息 · 匯率（FX）</text>
+
+  <rect x="800" y="220" width="170" height="110" rx="12" fill="#FFF7ED" stroke="#F59E0B" stroke-width="2"/>
+  <text x="885" y="252" text-anchor="middle" font-size="16" font-weight="bold" fill="#B45309">Google News</text>
+  <text x="885" y="282" text-anchor="middle" font-size="14.5" fill="#1E293B">RSS 關鍵字搜尋</text>
+  <text x="885" y="308" text-anchor="middle" font-size="14.5" fill="#1E293B">即時相關新聞標題</text>
+
+  <rect x="800" y="380" width="170" height="120" rx="12" fill="#F5F3FF" stroke="#8B5CF6" stroke-width="2"/>
+  <text x="885" y="412" text-anchor="middle" font-size="16" font-weight="bold" fill="#6D28D9">SQLite</text>
+  <text x="885" y="442" text-anchor="middle" font-size="14.5" fill="#1E293B">portfolio 持倉表</text>
+  <text x="885" y="468" text-anchor="middle" font-size="14.5" fill="#1E293B">WAL 模式</text>
+
+  <!-- 箭頭 -->
+  <line x1="330" y1="280" x2="418" y2="280" stroke="#64748B" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="374" y="266" text-anchor="middle" font-size="13.5" fill="#64748B">fetch JSON</text>
+
+  <line x1="720" y1="120" x2="798" y2="120" stroke="#64748B" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="759" y="108" text-anchor="middle" font-size="13.5" fill="#64748B">HTTPS</text>
+
+  <line x1="720" y1="275" x2="798" y2="275" stroke="#64748B" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="759" y="263" text-anchor="middle" font-size="13.5" fill="#64748B">RSS</text>
+
+  <line x1="720" y1="440" x2="798" y2="440" stroke="#64748B" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="759" y="428" text-anchor="middle" font-size="13.5" fill="#64748B">SQL</text>
+
+  <text x="500" y="545" text-anchor="middle" font-size="14" fill="#64748B">前端僅負責呈現與互動；所有股價、回測、預測、情緒計算皆由後端即時處理並快取</text>
+</svg>
