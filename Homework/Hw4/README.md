@@ -177,13 +177,13 @@ git switch -c develop
 git push -u origin develop
 ```
 
-### 5-2 在分支上新增檔案並提交
+### 5-2 在分支上修改檔案並提交
 
-建立 `Hw4/example.md` 後：
+在 `develop` 分支上修改 `Hw4/README.md`（本檔）後：
 
 ```powershell
-git add Hw4/example.md
-git commit -m "Add develop branch example"
+git add Hw4/README.md
+git commit -m "Update README on develop"
 git push origin develop
 ```
 
@@ -191,7 +191,7 @@ git push origin develop
 
 ```powershell
 git switch main
-git merge develop --no-ff -m "Merge develop: add example"
+git merge develop --no-ff -m "Merge develop"
 git push origin main
 ```
 
