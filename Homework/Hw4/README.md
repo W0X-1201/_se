@@ -150,7 +150,25 @@ gh pr merge <PR編號> --merge
 
 ## 5. 實作範例（本專案實際操作）
 
-以下是在本專案（`W0X-1201/_se`）實際做過的完整流程。
+以下是在本專案實際做過的完整流程。
+
+### 5-0 母專案 / 子專案 / 分支 的關係
+
+```
+母專案（source / upstream）        ccc115a/_se        ← 課程原始專案（ccc115a 組織）
+   │  Fork（複製一份到自己帳號）
+   ▼
+子專案（你的 Fork）                W0X-1201/_se       ← origin，你推送的目標
+   ├── 分支 main                    https://github.com/W0X-1201/_se/tree/main
+   └── 分支 develop                 https://github.com/W0X-1201/_se/tree/develop
+```
+
+| 角色 | 名稱 | 連結 |
+|---|---|---|
+| 母專案 | `ccc115a/_se` | https://github.com/ccc115a/_se |
+| 子專案（Fork） | `W0X-1201/_se` | https://github.com/W0X-1201/_se |
+| 分支 `main` | 預設分支 | https://github.com/W0X-1201/_se/tree/main |
+| 分支 `develop` | 開發分支 | https://github.com/W0X-1201/_se/tree/develop |
 
 ### 5-1 建立 `develop` 分支
 
