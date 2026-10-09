@@ -148,6 +148,44 @@ gh pr merge <PR編號> --merge
 
 ---
 
+## 5. 實作範例（本專案實際操作）
+
+以下是在本專案（`W0X-1201/_se`）實際做過的完整流程。
+
+### 5-1 建立 `develop` 分支
+
+```powershell
+git switch -c develop
+git push -u origin develop
+```
+
+### 5-2 在分支上新增檔案並提交
+
+建立 `Hw4/example.md` 後：
+
+```powershell
+git add Hw4/example.md
+git commit -m "Add develop branch example"
+git push origin develop
+```
+
+### 5-3 合併回 `main`
+
+```powershell
+git switch main
+git merge develop --no-ff -m "Merge develop: add example"
+git push origin main
+```
+
+### 成果連結
+
+| 項目 | 連結 |
+|---|---|
+| `develop` 分支 | https://github.com/W0X-1201/_se/tree/develop |
+| `main` 提交紀錄 | https://github.com/W0X-1201/_se/commits/main |
+
+---
+
 ## 快速對照表
 
 | 目標 | 主要指令 | 網站動作 |
