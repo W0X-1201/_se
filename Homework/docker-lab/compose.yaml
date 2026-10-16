@@ -1,0 +1,20 @@
+services:
+  web:
+    build: .
+    ports:
+      - "5001:5000"
+    environment:
+      - APP_ENV=production
+    depends_on:
+      - cache
+    networks:
+      - appnet
+
+  cache:
+    image: redis:7-alpine
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge
