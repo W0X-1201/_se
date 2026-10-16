@@ -1,0 +1,60 @@
+services:
+  # 資料庫：PostgreSQL
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-appuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-apppass}
+      POSTGRES_DB: ${POSTGRES_DB:-appdb}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-appuser} -d ${POSTGRES_DB:-appdb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - backend
+
+  # 主要服務：Python (FastAPI) — 提供 Web 介面與 API，並寫入資料庫
+  python-app:
+    build: ./python-app
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-appuser}:${POSTGRES_PASSWORD:-apppass}@db:5432/${POSTGRES_DB:-appdb}
+      SERVICE_NAME: python-app
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend
+
+  # 次要服務：Node.js (Express) — 展示多語言共存
+  node-app:
+    build: ./node-app
+    networks:
+      - backend
+
+  # 次要服務：Rust (std 實作) — 展示多語言共存
+  rust-app:
+    build: ./rust-app
+    networks:
+      - backend
+
+  # 反向代理：Nginx，對外唯一入口
+  nginx:
+    build: ./nginx
+    ports:
+      - "${WEB_PORT:-80}:80"
+    depends_on:
+      - python-app
+      - node-app
+      - rust-app
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
