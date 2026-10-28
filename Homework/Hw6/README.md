@@ -30,7 +30,7 @@ Hw6/
 
 ## 架構圖
 
-![系統架構圖](./images/architecture.png)
+![系統架構圖](./images/architecture.svg)
 
 ## 測試流程圖
 
@@ -45,7 +45,7 @@ cd Hw6/backend
 cargo test --bin backend
 ```
 
-![單元測試結果](./images/unit-test-result.png)
+截圖：執行 `cargo test --bin backend` 後將終端輸出結果截圖，存為 `images/unit-test-result.png`
 
 ### 2) 系統測試（Web API Test）
 
@@ -54,7 +54,7 @@ cd Hw6/backend
 cargo test --test api_test
 ```
 
-![系統測試結果](./images/system-test-result.png)
+截圖：執行 `cargo test --test api_test` 後將終端輸出結果截圖，存為 `images/system-test-result.png`
 
 ### 3) E2E 測試（Playwright）
 
@@ -75,7 +75,7 @@ npx playwright test
 npx playwright show-report
 ```
 
-![E2E 測試結果](./images/e2e-test-result.png)
+截圖：執行 `npx playwright test` 的終端輸出或 `npx playwright show-report` 的報告畫面，存為 `images/e2e-test-result.png`
 
 ## 三種測試比較總結
 
