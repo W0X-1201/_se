@@ -1,0 +1,16 @@
+graph TD
+  A[瀏覽器使用者] --> B[frontend/index.html\nHTML + JS]
+  B --> C[Axum Server\nlocalhost:3000]
+  C --> D[api.rs\n/api/todos GET/POST]
+  D --> E[todo.rs\nTodoStore 業務邏輯]
+  C --> F[tower-http ServeDir\n靜態檔案託管 frontend/]
+
+  subgraph "測試架構"
+    G[1. 單元測試\ntodo.rs #[test]]
+    H[2. 系統測試\ntests/api_test.rs\ntower::ServiceExt]
+    I[3. E2E 測試\ne2e/tests/todo.spec.js\nPlaywright]
+  end
+
+  G -. 驗證 .-> E
+  H -. 模擬 HTTP 請求 .-> D
+  I -. 真實瀏覽器操作 .-> B

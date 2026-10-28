@@ -1,0 +1,6 @@
+flowchart LR
+  A[開發] --> B[1. 單元測試\ncargo test --bin backend\n驗證 todo.rs 邏輯]
+  B --> C[2. 系統測試\ncargo test --test api_test\n驗證 API 路由與協定]
+  C --> D[啟動 Server\ncargo run\nlocalhost:3000]
+  D --> E[3. E2E 測試\nnpx playwright test\n模擬真實使用者操作]
+  E --> F[全系統驗證完成]

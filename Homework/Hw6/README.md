@@ -34,7 +34,7 @@ Hw6/
 
 ## 測試流程圖
 
-![測試流程圖](./images/testing-flow.png)
+![測試流程圖](./images/testing-flow.svg)
 
 ## 執行方式
 
