@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="640" viewBox="0 0 1000 640" role="img" aria-label="AI 文件助教系統架構圖">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 z" fill="#64748b" />
+    </marker>
+    <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="2" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M10,0 L0,5 L10,10 z" fill="#64748b" />
+    </marker>
+    <style>
+      .title { font-family: "Noto Sans TC", "Segoe UI", sans-serif; font-size: 24px; font-weight: 700; fill: #0f172a; }
+      .subtitle { font-family: "Noto Sans TC", "Segoe UI", sans-serif; font-size: 13px; fill: #64748b; }
+      .box-title { font-family: "Noto Sans TC", "Segoe UI", sans-serif; font-size: 16px; font-weight: 700; fill: #0f172a; }
+      .line { font-family: "Noto Sans TC", "Segoe UI", sans-serif; font-size: 13px; fill: #334155; }
+      .small { font-family: "Noto Sans TC", "Segoe UI", sans-serif; font-size: 12px; fill: #475569; }
+      .label { font-family: "Noto Sans TC", "Segoe UI", sans-serif; font-size: 12px; fill: #475569; }
+      .num { font-family: "Segoe UI", sans-serif; font-size: 13px; font-weight: 700; fill: #4f46e5; }
+    </style>
+  </defs>
+
+  <rect width="1000" height="640" fill="#f8fafc" />
+
+  <text class="title" x="40" y="46">AI 文件助教 — RAG 系統架構</text>
+  <text class="subtitle" x="40" y="70">上傳 PDF → 切段向量化 → 相似度檢索 → 本機 LLM 生成答案（附引用來源）</text>
+
+  <!-- Browser -->
+  <rect x="40" y="150" width="200" height="200" rx="14" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5" />
+  <text class="box-title" x="60" y="182">瀏覽器前端</text>
+  <text class="line" x="60" y="214">index.html</text>
+  <text class="line" x="60" y="236">app.js / style.css</text>
+  <text class="line" x="60" y="272">• 上傳 PDF</text>
+  <text class="line" x="60" y="294">• 輸入問題</text>
+  <text class="line" x="60" y="316">• 顯示答案與引用</text>
+
+  <!-- Express -->
+  <rect x="300" y="90" width="380" height="380" rx="16" fill="#eef2ff" stroke="#6366f1" stroke-width="1.8" />
+  <text class="box-title" x="324" y="122">Express 後端（server.js）</text>
+  <rect x="324" y="140" width="3" height="300" rx="1.5" fill="#6366f1" opacity="0.5" />
+
+  <text class="num" x="344" y="168">①</text>
+  <text class="line" x="366" y="168">POST /api/documents 上傳</text>
+
+  <text class="num" x="344" y="204">②</text>
+  <text class="line" x="366" y="204">extractPdf 逐頁擷取文字</text>
+
+  <text class="num" x="344" y="240">③</text>
+  <text class="line" x="366" y="240">buildChunks 切段（保留頁碼）</text>
+
+  <text class="num" x="344" y="276">④</text>
+  <text class="line" x="366" y="276">ollama.embed 產生向量</text>
+
+  <text class="num" x="344" y="312">⑤</text>
+  <text class="line" x="366" y="312">cosine 相似度取 top-k</text>
+
+  <text class="num" x="344" y="348">⑥</text>
+  <text class="line" x="366" y="348">組 prompt 並呼叫 ollama.chat</text>
+
+  <text class="num" x="344" y="384">⑦</text>
+  <text class="line" x="366" y="384">回傳答案與引用來源</text>
+
+  <rect x="324" y="408" width="332" height="42" rx="8" fill="#ffffff" stroke="#c7d2fe" />
+  <text class="small" x="338" y="434">關鍵：prompt 要求只能依片段作答並標註 [1]、[2]</text>
+
+  <!-- SQLite -->
+  <rect x="300" y="520" width="380" height="90" rx="14" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5" />
+  <text class="box-title" x="324" y="552">SQLite（node:sqlite）</text>
+  <text class="line" x="324" y="578">documents：檔名、頁數、段數</text>
+  <text class="line" x="324" y="598">chunks：段落、頁碼、embedding</text>
+
+  <!-- Ollama -->
+  <rect x="740" y="140" width="220" height="280" rx="16" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5" />
+  <text class="box-title" x="762" y="172">Ollama（本機）</text>
+  <text class="line" x="762" y="204">nomic-embed-text</text>
+  <text class="small" x="762" y="224">→ 產生嵌入向量</text>
+  <rect x="762" y="244" width="176" height="1" fill="#a7f3d0" />
+  <text class="line" x="762" y="276">llama3.2</text>
+  <text class="small" x="762" y="296">→ 依檢索片段生成答案</text>
+  <rect x="762" y="316" width="176" height="1" fill="#a7f3d0" />
+  <text class="small" x="762" y="344">免費、免 API key</text>
+  <text class="small" x="762" y="364">文件資料不外傳</text>
+  <text class="small" x="762" y="384">預設 http://localhost:11434</text>
+
+  <!-- Arrows -->
+  <line x1="240" y1="250" x2="298" y2="250" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" />
+  <text class="label" x="243" y="240">HTTP / JSON</text>
+
+  <line x1="490" y1="470" x2="490" y2="518" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" />
+  <text class="label" x="500" y="500">讀寫</text>
+
+  <line x1="680" y1="250" x2="738" y2="250" stroke="#64748b" stroke-width="2" marker-start="url(#arrow-start)" marker-end="url(#arrow)" />
+  <text class="label" x="686" y="240">embeddings / chat</text>
+
+  <text class="subtitle" x="40" y="620">Hw7（Week 8）· Node.js 24 + Express 5 + node:sqlite + pdf-parse + Ollama</text>
+</svg>

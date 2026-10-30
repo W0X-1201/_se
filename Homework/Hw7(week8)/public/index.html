@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 文件助教</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">📄</span>
+      <div>
+        <h1>AI 文件助教</h1>
+        <p>上傳 PDF，用自然語言問答，回答附原文出處</p>
+      </div>
+    </div>
+    <div id="status" class="status">檢查 Ollama 中…</div>
+  </header>
+
+  <main class="layout">
+    <aside class="panel sidebar">
+      <h2>文件庫</h2>
+      <form id="upload-form">
+        <label id="drop" class="drop">
+          <input type="file" id="file" accept="application/pdf" hidden />
+          <span id="drop-text">點擊或拖曳 PDF 到這裡</span>
+          <small>支援文字型 PDF，上限 25MB</small>
+        </label>
+        <button type="submit" id="upload-btn" class="primary" disabled>上傳並建立索引</button>
+      </form>
+      <ul id="doc-list" class="doc-list"></ul>
+    </aside>
+
+    <section class="panel chat">
+      <div class="chat-head">
+        <h2 id="chat-title">請先選擇一份文件</h2>
+        <span id="chat-meta" class="meta"></span>
+      </div>
+      <div id="messages" class="messages">
+        <div class="empty">選一份文件，然後在下方提問。例如：「這份文件的重點是什麼？」</div>
+      </div>
+      <form id="chat-form" class="composer">
+        <input id="question" type="text" placeholder="輸入你的問題…" autocomplete="off" disabled />
+        <button type="submit" id="ask-btn" class="primary" disabled>送出</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

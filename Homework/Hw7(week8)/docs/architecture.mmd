@@ -1,0 +1,14 @@
+flowchart LR
+    U[使用者] -->|上傳 PDF / 提問| F[瀏覽器前端<br/>index.html + app.js]
+    F -->|HTTP / JSON| B[Express 後端<br/>server.js]
+
+    B -->|解析文字| P[pdf-parse<br/>逐頁擷取]
+    P --> C[切段 chunk<br/>700 字 / 重疊 120]
+    C -->|embed| E[Ollama<br/>nomic-embed-text]
+    E -->|向量| D[(SQLite<br/>documents / chunks)]
+
+    B -->|問題 embed| E
+    B -->|cosine top-k| D
+    B -->|context + question| L[Ollama<br/>llama3.2]
+    L -->|答案| B
+    B -->|答案 + 引用來源| F

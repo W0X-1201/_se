@@ -17,6 +17,8 @@
 [Hw3](Homework/Hw3/) | [OmniStock AI](Homework/Hw3/) | 智慧股票資產管理平台，串接 Yahoo Finance 即時報價與 Google News RSS 的三層架構應用
 [Hw4](Homework/Hw4/) | [Git / GitHub 操作說明](Homework/Hw4/) | 分支建立、合併、Fork 與 Pull Request 的完整操作指南
 [Hw5](Homework/Hw5/) | [Docker 學習紀錄與微服務系統](Homework/Hw5/) | Docker 核心觀念與常用指令，含 Dockerfile、Volume、Network、Compose，以及 Nginx＋PostgreSQL＋Python/Node.js/Rust 的多語言微服務系統
+[Hw6](Homework/Hw6/) | [Todo App 測試](Homework/Hw6/) | 以 Rust Axum 實作 Todo App，示範單元測試、Web API 系統測試與 Playwright E2E 測試三層架構
+[Hw7](<Homework/Hw7(week8)/>) | [AI 文件助教](<Homework/Hw7(week8)/>) | 以 RAG＋Ollama 打造的 PDF 問答系統，上傳講義即可用自然語言提問並附引用來源與頁碼
 
 ## 系統展示（Hw5 微服務系統）
 
