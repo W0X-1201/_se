@@ -19,7 +19,7 @@
 [Hw5](Homework/Hw5/) | [Docker 學習紀錄與微服務系統](Homework/Hw5/) | Docker 核心觀念與常用指令，含 Dockerfile、Volume、Network、Compose，以及 Nginx＋PostgreSQL＋Python/Node.js/Rust 的多語言微服務系統
 [Hw6](Homework/Hw6/) | [Todo App 測試](Homework/Hw6/) | 以 Rust Axum 實作 Todo App，示範單元測試、Web API 系統測試與 Playwright E2E 測試三層架構
 [Hw7](<Homework/Hw7(week8)/>) | [AI 文件助教](<Homework/Hw7(week8)/>) | 以 RAG＋Ollama 打造的 PDF 問答系統，上傳講義即可用自然語言提問並附引用來源與頁碼
-[Hw8](<Homework/Hw8(week9)/>) | [MinimalFocus 專注儀表板](<Homework/Hw8(week9)/>) | 以 Cloudflare Pages 部署的純前端專注儀表板，含即時時鐘、番茄鐘與 LocalStorage 待辦清單（部署網址：待補 `<your-project>.pages.dev`）
+[Hw8](<Homework/Hw8(week9)/>) | [MyShop POS 個人商店](<Homework/Hw8(week9)/>) | Cloudflare Workers + D1 全端 POS 系統，含 PBKDF2 認證、開店模板、金額防竄改點單、交易快照、每日結算與商品軟刪除（部署網址：[myshop.w0xie-1201.workers.dev](https://myshop.w0xie-1201.workers.dev)）
 
 ## 系統展示（Hw5 微服務系統）
 

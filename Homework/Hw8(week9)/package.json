@@ -1,0 +1,18 @@
+{
+  "name": "myshop-pos",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MyShop POS - Cloudflare Workers + D1 personal shop point-of-sale app",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create myshop-db",
+    "db:init": "wrangler d1 execute myshop-db --remote --file=schema.sql",
+    "db:init:local": "wrangler d1 execute myshop-db --local --file=schema.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
