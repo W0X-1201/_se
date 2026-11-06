@@ -6,31 +6,20 @@
 教師 | [陳鍾誠](https://www.nqu.edu.tw/educsie/index.php?act=blog&code=list&ids=4)
 學校 | [金門大學資訊工程系](https://www.nqu.edu.tw/educsie/index.php)
 學生 | 謝宛玲
-學號 | 111410508
+學號 | 08
 
 ## 作業與專案
 
-111410508 謝宛玲
-
-第幾週 | 習題內容 | 有上課且準時繳交 | 補交且附上請假證明 | 作業連結
--------|---------|-----------------|-----------------|------------
-1 | curl | 是 | | [curl](https://github.com/W0X-1201/_se/tree/main/Homework/Hw1)
-2 | 校務系統 | 是 | | [校務系統](https://github.com/W0X-1201/_se/tree/main/Homework/Hw2)
-3 | 有價值專案 | 是 | | [有價值專案](https://github.com/W0X-1201/_se/tree/main/Homework/Hw3)
-4 | git flow | 否 | [是（見下方）](#第-4-週請假證明) | [git flow](https://github.com/W0X-1201/_se/tree/main/Homework/Hw4)
-5 | (放假) | 無 | |
-6 | docker | 是 | | [docker](https://github.com/W0X-1201/_se/tree/main/Homework/Hw5)
-7 | 網站測試 | 是 | | [網站測試](https://github.com/W0X-1201/_se/tree/main/Homework/Hw6)
-8 | 有價值專案 | 是 | | [有價值專案](https://github.com/W0X-1201/_se/tree/main/Homework/Hw7%28week8%29)
-9 | cloudflare 網站專案 | 是 | | [cloudflare網站專案](<https://github.com/W0X-1201/_se/tree/main/Homework/Hw8(week9)>)
-
----
-
-### 第 4 週請假證明
-
-![第 4 週請假證明](https://github.com/user-attachments/assets/d06b4961-838c-4f3b-8964-ecbee643c138)
-
----
+作業 | 專案 | 說明
+-----|------|-----
+[Hw1](Homework/Hw1/) | [rcurl](Homework/Hw1/) | 用 Rust 手寫 HTTP/1.1 的類 curl 命令列工具，支援 HTTPS、POST/JSON、302 導向、gzip、基本認證與 curl 相容退出碼
+[Hw2](Homework/Hw2/) | [NQU 校務資訊系統](Homework/Hw2/) | 前端 → 後端 → 資料庫三層架構的大學校務系統，涵蓋學生、教師、管理員三種角色的完整流程
+[Hw3](Homework/Hw3/) | [OmniStock AI](Homework/Hw3/) | 智慧股票資產管理平台，串接 Yahoo Finance 即時報價與 Google News RSS 的三層架構應用
+[Hw4](Homework/Hw4/) | [Git / GitHub 操作說明](Homework/Hw4/) | 分支建立、合併、Fork 與 Pull Request 的完整操作指南
+[Hw5](Homework/Hw5/) | [Docker 學習紀錄與微服務系統](Homework/Hw5/) | Docker 核心觀念與常用指令，含 Dockerfile、Volume、Network、Compose，以及 Nginx＋PostgreSQL＋Python/Node.js/Rust 的多語言微服務系統
+[Hw6](Homework/Hw6/) | [Todo App 測試](Homework/Hw6/) | 以 Rust Axum 實作 Todo App，示範單元測試、Web API 系統測試與 Playwright E2E 測試三層架構
+[Hw7](<Homework/Hw7(week8)/>) | [AI 文件助教](<Homework/Hw7(week8)/>) | 以 RAG＋Ollama 打造的 PDF 問答系統，上傳講義即可用自然語言提問並附引用來源與頁碼
+[Hw8](<Homework/Hw8(week9)/>) | [MyShop POS 個人商店](<Homework/Hw8(week9)/>) | Cloudflare Workers + D1 全端 POS 系統，含 PBKDF2 認證、開店模板、金額防竄改點單、交易快照、每日結算與商品軟刪除（部署網址：[myshop.w0xie-1201.workers.dev](https://myshop.w0xie-1201.workers.dev)）
 
 ## 系統展示（Hw5 微服務系統）
 
