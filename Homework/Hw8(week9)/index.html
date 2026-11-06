@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MinimalFocus - 專注儀表板</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --danger: #f43f5e;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1e293b, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    #greeting {
+      font-size: 1.5rem;
+      font-weight: 300;
+      color: var(--text-muted);
+    }
+
+    #clock {
+      font-size: 3.5rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--primary);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* 番茄鐘樣式 */
+    .timer-display {
+      font-size: 4rem;
+      text-align: center;
+      font-weight: 600;
+      margin: 1rem 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-controls {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    button {
+      background: var(--primary);
+      color: #000;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+      color: #fff;
+    }
+
+    button.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
+
+    button.secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* 待辦事項樣式 */
+    .todo-input-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      color: var(--text);
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+
+    ul.todo-list {
+      list-style: none;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    li.todo-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .todo-item.done span {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .todo-item span {
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .delete-btn {
+      background: transparent;
+      color: var(--text-muted);
+      padding: 0.2rem 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .delete-btn:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    footer {
+      margin-top: auto;
+      padding-top: 2rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div id="greeting">你好，今天也要保持專注</div>
+    <div id="clock">00:00:00</div>
+  </header>
+
+  <main class="container">
+    <!-- 番茄鐘卡片 -->
+    <section class="card">
+      <h2>🍅 專注番茄鐘</h2>
+      <div class="timer-display" id="timer">25:00</div>
+      <div class="timer-controls">
+        <button id="start-btn">開始</button>
+        <button id="pause-btn" class="secondary">暫停</button>
+        <button id="reset-btn" class="secondary">重設</button>
+      </div>
+    </section>
+
+    <!-- 待辦清單卡片 -->
+    <section class="card">
+      <h2>📝 今日任務</h2>
+      <div class="todo-input-group">
+        <input type="text" id="todo-input" placeholder="新增待辦任務..." />
+        <button id="add-todo-btn">新增</button>
+      </div>
+      <ul class="todo-list" id="todo-list"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>Deployed with ❤️ on <strong>Cloudflare Pages</strong></p>
+  </footer>
+
+  <script>
+    // 1. 即時時鐘與問候語
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+
+      const hr = now.getHours();
+      let text = "夜深了，注意休息";
+      if (hr >= 5 && hr < 12) text = "早安，開啟充實的一天";
+      else if (hr >= 12 && hr < 18) text = "午安，保持專注與效率";
+      else if (hr >= 18 && hr < 23) text = "晚安，今天辛苦了";
+      document.getElementById('greeting').textContent = text;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 2. 番茄鐘邏輯
+    let timeLeft = 25 * 60;
+    let timerId = null;
+
+    const timerDisplay = document.getElementById('timer');
+    const startBtn = document.getElementById('start-btn');
+    const pauseBtn = document.getElementById('pause-btn');
+    const resetBtn = document.getElementById('reset-btn');
+
+    function renderTimer() {
+      const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+      const s = String(timeLeft % 60).padStart(2, '0');
+      timerDisplay.textContent = `${m}:${s}`;
+    }
+
+    startBtn.addEventListener('click', () => {
+      if (timerId !== null) return;
+      timerId = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          renderTimer();
+        } else {
+          clearInterval(timerId);
+          timerId = null;
+          alert('🎉 時間到！休息一下吧！');
+        }
+      }, 1000);
+    });
+
+    pauseBtn.addEventListener('click', () => {
+      clearInterval(timerId);
+      timerId = null;
+    });
+
+    resetBtn.addEventListener('click', () => {
+      clearInterval(timerId);
+      timerId = null;
+      timeLeft = 25 * 60;
+      renderTimer();
+    });
+
+    // 3. 待辦事項邏輯 (支援 LocalStorage 儲存)
+    const todoInput = document.getElementById('todo-input');
+    const addTodoBtn = document.getElementById('add-todo-btn');
+    const todoList = document.getElementById('todo-list');
+
+    let todos = JSON.parse(localStorage.getItem('my_todos')) || [
+      { text: '完成 Cloudflare 作業部署', done: false }
+    ];
+
+    function saveAndRenderTodos() {
+      localStorage.setItem('my_todos', JSON.stringify(todos));
+      todoList.innerHTML = '';
+      todos.forEach((todo, index) => {
+        const li = document.createElement('li');
+        li.className = `todo-item ${todo.done ? 'done' : ''}`;
+        li.innerHTML = `
+          <span>${todo.text}</span>
+          <button class="delete-btn" onclick="deleteTodo(${index})">✕</button>
+        `;
+        li.querySelector('span').addEventListener('click', () => toggleTodo(index));
+        todoList.appendChild(li);
+      });
+    }
+
+    function addTodo() {
+      const val = todoInput.value.trim();
+      if (!val) return;
+      todos.push({ text: val, done: false });
+      todoInput.value = '';
+      saveAndRenderTodos();
+    }
+
+    window.toggleTodo = function(index) {
+      todos[index].done = !todos[index].done;
+      saveAndRenderTodos();
+    };
+
+    window.deleteTodo = function(index) {
+      todos.splice(index, 1);
+      saveAndRenderTodos();
+    };
+
+    addTodoBtn.addEventListener('click', addTodo);
+    todoInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') addTodo();
+    });
+
+    saveAndRenderTodos();
+  </script>
+</body>
+</html>
