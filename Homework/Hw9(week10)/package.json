@@ -1,0 +1,48 @@
+{
+  "name": "@xie00000/myshop-pos",
+  "version": "1.0.0",
+  "description": "MyShop POS core logic for Cloudflare Workers + D1: reusable API handlers, shop templates, validation and session helpers, importable from Node.js.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./templates": "./src/templates.js",
+    "./worker": "./src/worker.js"
+  },
+  "files": [
+    "index.js",
+    "src",
+    "public",
+    "schema.sql",
+    "wrangler.jsonc",
+    "README.md"
+  ],
+  "keywords": [
+    "pos",
+    "point-of-sale",
+    "cloudflare-workers",
+    "cloudflare-d1",
+    "serverless",
+    "worker",
+    "shop",
+    "api",
+    "esm"
+  ],
+  "license": "MIT",
+  "author": "Xie Wan-Ling",
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "node test.js",
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyShop POS · 個人商店</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <section id="auth-view" class="auth-view hidden">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="logo">MS</div>
+        <h1>MyShop POS</h1>
+        <p class="muted">輕量、即時的個人商店收銀系統</p>
+      </div>
+
+      <div class="tabs">
+        <button type="button" class="tab active" data-auth-tab="login">登入</button>
+        <button type="button" class="tab" data-auth-tab="register">註冊</button>
+      </div>
+
+      <form id="login-form" class="form">
+        <label class="field">
+          <span>電子郵件</span>
+          <input type="email" name="email" autocomplete="email" required />
+        </label>
+        <label class="field">
+          <span>密碼</span>
+          <input type="password" name="password" autocomplete="current-password" required />
+        </label>
+        <p class="form-error" data-error></p>
+        <button type="submit" class="btn primary block">登入</button>
+      </form>
+
+      <form id="register-form" class="form hidden">
+        <label class="field">
+          <span>商店主人名稱</span>
+          <input type="text" name="name" autocomplete="name" maxlength="50" placeholder="選填" />
+        </label>
+        <label class="field">
+          <span>電子郵件</span>
+          <input type="email" name="email" autocomplete="email" required />
+        </label>
+        <label class="field">
+          <span>密碼</span>
+          <input type="password" name="password" autocomplete="new-password" minlength="6" required />
+        </label>
+        <p class="form-error" data-error></p>
+        <button type="submit" class="btn primary block">建立帳號</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="setup-view" class="setup-view hidden">
+    <div class="setup-card">
+      <div class="setup-head">
+        <h1>建立你的第一間店</h1>
+        <p class="muted">選擇模板，系統會自動建立初始商品</p>
+      </div>
+
+      <form id="shop-form" class="form">
+        <label class="field">
+          <span>店名</span>
+          <input type="text" name="name" maxlength="50" placeholder="例如：巷口珍奶" required />
+        </label>
+
+        <div class="field">
+          <span>選擇模板</span>
+          <div id="template-grid" class="template-grid"></div>
+        </div>
+
+        <p class="form-error" data-error></p>
+        <div class="row end">
+          <button type="button" id="setup-logout" class="btn ghost">登出</button>
+          <button type="submit" class="btn primary">開店</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="app-view" class="app-view hidden">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="logo small">MS</div>
+        <div>
+          <h1 id="shop-name">我的商店</h1>
+          <p class="muted small-text"><span id="shop-template"></span> · <span id="user-name"></span></p>
+        </div>
+      </div>
+      <button id="logout-btn" class="btn ghost">登出</button>
+    </header>
+
+    <nav class="nav" id="nav">
+      <button class="nav-btn active" data-panel="pos">點單</button>
+      <button class="nav-btn" data-panel="orders">訂單記錄</button>
+      <button class="nav-btn" data-panel="report">結算報表</button>
+      <button class="nav-btn" data-panel="products">商品管理</button>
+    </nav>
+
+    <main class="main">
+      <section class="panel active" data-panel-view="pos">
+        <div class="pos-layout">
+          <div class="pos-products">
+            <div class="section-head">
+              <h2>選擇商品</h2>
+              <span class="pill" id="pos-date-pill"></span>
+            </div>
+            <div id="product-grid" class="product-grid"></div>
+            <p id="product-empty" class="empty hidden">還沒有商品，請到「商品管理」新增。</p>
+          </div>
+
+          <aside class="cart">
+            <div class="section-head">
+              <h2>購物車</h2>
+              <button id="clear-cart" type="button" class="link-btn">清空</button>
+            </div>
+            <ul id="cart-list" class="cart-list"></ul>
+            <p id="cart-empty" class="empty">尚未加入商品</p>
+            <div class="cart-total">
+              <span>合計</span>
+              <strong id="cart-total">NT$ 0</strong>
+            </div>
+            <p class="muted small-text">交易日期：<span id="cart-date"></span></p>
+            <button id="checkout-btn" type="button" class="btn primary block" disabled>完成交易</button>
+          </aside>
+        </div>
+      </section>
+
+      <section class="panel" data-panel-view="orders">
+        <div class="section-head wrap">
+          <h2>訂單記錄</h2>
+          <div class="row">
+            <input type="date" id="orders-date" class="date-input" />
+            <button id="orders-query" type="button" class="btn secondary">查詢</button>
+          </div>
+        </div>
+        <div id="orders-list" class="orders-list"></div>
+        <p id="orders-empty" class="empty hidden">這一天還沒有交易</p>
+      </section>
+
+      <section class="panel" data-panel-view="report">
+        <div class="section-head wrap">
+          <h2>每日結算</h2>
+          <div class="row">
+            <input type="date" id="report-date" class="date-input" />
+            <button id="report-query" type="button" class="btn secondary">查詢</button>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat-card"><span>交易筆數</span><strong id="report-count">0</strong></div>
+          <div class="stat-card"><span>營業總額</span><strong id="report-revenue">NT$ 0</strong></div>
+          <div class="stat-card"><span>客單價平均</span><strong id="report-avg">NT$ 0</strong></div>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr><th>商品</th><th class="num">銷售數量</th><th class="num">小計</th></tr>
+            </thead>
+            <tbody id="report-body"></tbody>
+          </table>
+        </div>
+        <p id="report-empty" class="empty hidden">這一天還沒有銷售資料</p>
+      </section>
+
+      <section class="panel" data-panel-view="products">
+        <div class="section-head wrap">
+          <h2>商品管理</h2>
+        </div>
+        <form id="product-form" class="inline-form">
+          <input type="text" name="name" placeholder="商品名稱" maxlength="50" required />
+          <input type="number" name="price" placeholder="售價" min="1" step="1" required />
+          <button type="submit" class="btn primary">新增商品</button>
+        </form>
+        <div id="product-list" class="product-list"></div>
+        <p id="product-list-empty" class="empty hidden">目前沒有商品</p>
+      </section>
+    </main>
+  </section>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
