@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>雀神副駕駛：四人擬真吃碰槓實戰系統</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="mahjong-table">
+    <div class="table-felt">
+      
+      <!-- 喊牌全螢幕大字橫幅 -->
+      <div id="callout-banner" class="callout-overlay" style="display: none;">
+        <div class="callout-content">
+          <div id="callout-actor" class="callout-actor"></div>
+          <div id="callout-text" class="callout-action">🀄 碰！</div>
+        </div>
+      </div>
+
+      <!-- 頂部：對家 (楊姐) -->
+      <div class="seat seat-top">
+        <div class="player-info">
+          <span class="avatar">👩</span>
+          <div>
+            <div class="p-name">對家・楊姐 <span id="top-threat-badge" class="threat-badge" style="display:none;">⚠️ 聽牌警戒中</span></div>
+            <div class="p-status">伺機而動</div>
+          </div>
+        </div>
+        <div id="hand-top" class="hand-opponent horizontal"></div>
+        <div id="melds-top" class="table-meld-area melds-h"></div>
+      </div>
+
+      <!-- 中央對戰區：小亮 + 鍋底 + 4向牌河 + 羅盤 -->
+      <div class="table-middle-row">
+        <!-- 左邊：上家 (小亮) -->
+        <div class="seat seat-left">
+          <div class="player-info vertical">
+            <span class="avatar">👦</span>
+            <div class="p-name">上家・小亮 <span id="left-threat-badge" class="threat-badge" style="display:none;">⚠️ 聽牌</span></div>
+          </div>
+          <div id="hand-left" class="hand-opponent vertical"></div>
+          <div id="melds-left" class="table-meld-area melds-v"></div>
+        </div>
+
+        <!-- 桌心：四向牌河與羅盤 -->
+        <div class="table-center-board">
+          <div id="river-top" class="river-box river-top"></div>
+          <div class="river-middle">
+            <div id="river-left" class="river-box river-left"></div>
+            
+            <div class="compass-hud">
+              <div class="compass-core">
+                <span class="round-name">東風圈</span>
+                <span id="turn-indicator" class="active-turn">輪到你</span>
+                <span class="tiles-left">餘牌 <strong id="wall-count">64</strong></span>
+              </div>
+            </div>
+
+            <div id="river-right" class="river-box river-right"></div>
+          </div>
+          <div id="river-bottom" class="river-box river-bottom"></div>
+        </div>
+
+        <!-- 右邊：下家 (鍋底) -->
+        <div class="seat seat-right">
+          <div id="melds-right" class="table-meld-area melds-v"></div>
+          <div id="hand-right" class="hand-opponent vertical"></div>
+          <div class="player-info vertical">
+            <span class="avatar">🧑</span>
+            <div class="p-name">下家・鍋底 <span id="right-threat-badge" class="threat-badge" style="display:none;">⚠️ 聽牌</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部：玩家操作區與 AI HUD -->
+      <div class="player-bottom-area">
+        
+        <!-- 吃碰槓中斷決策列 -->
+        <div id="meld-action-bar" class="meld-bar" style="display: none;">
+          <div class="meld-top-row">
+            <span id="meld-prompt" class="meld-prompt">有人出牌！</span>
+            <div class="meld-buttons">
+              <button id="btn-action-chow" class="meld-btn chow" style="display: none;">🥢 吃牌</button>
+              <button id="btn-action-pung" class="meld-btn pung" style="display: none;">🀄 碰牌</button>
+              <button id="btn-action-kong" class="meld-btn kong" style="display: none;">👑 槓牌</button>
+              <button id="btn-action-skip" class="meld-btn skip">❌ 過 (Skip)</button>
+            </div>
+          </div>
+          <div class="meld-ai-advisor">
+            <div class="advisor-title">🤖 AI 副駕駛決策評估：<strong id="meld-ai-decision">評估中...</strong></div>
+            <p id="meld-ai-reason" class="advisor-desc"></p>
+          </div>
+        </div>
+
+        <!-- AI 戰術 HUD -->
+        <div id="ai-hud" class="ai-hud-card">
+          <div class="hud-status">
+            <span id="hud-pulse" class="pulse-indicator"></span>
+            <span id="hud-title" class="hud-title">AI 副駕駛即時戰術指引 (🟢 進攻模式)</span>
+            <button id="toggle-defense-btn" class="hud-btn-defense">🛡️ 切換防放槍下車</button>
+          </div>
+          <p id="coach-text" class="hud-message">
+            輪到你的回合！請點擊右側<strong>「摸牌」</strong>，AI 將為你實時計算全域最優解！
+          </p>
+        </div>
+
+        <!-- 玩家手牌架與桌面副露區 -->
+        <div class="player-controls">
+          <div class="action-bar">
+            <button id="draw-btn" class="game-btn btn-draw">🀅 摸牌</button>
+            <button id="demo-preset-btn" class="game-btn btn-preset">⚡ 上台演示</button>
+            <button id="reset-btn" class="game-btn btn-reset">🔄 洗牌</button>
+          </div>
+
+          <div class="tile-rack-wrapper">
+            <div id="player-melds" class="table-meld-area player-melds"></div>
+            <div class="tile-rack">
+              <div id="player-hand" class="hand-tiles"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 1. 自摸胡牌彈窗（含台數明細清單） -->
+  <div id="win-modal" class="modal" style="display: none;">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card win-card">
+      <div class="win-banner">🀄 自 摸 胡 牌 🀄</div>
+      
+      <div class="winning-showcase" style="margin: 10px 0 12px;">
+        <span class="win-label">絕殺摸進</span>
+        <div id="win-tile-box"></div>
+        <div id="win-tile-text" class="win-tile-name"></div>
+      </div>
+
+      <div class="tai-summary-box">
+        <div class="tai-header">🏆 台數明細 (結算清單)</div>
+        <ul id="win-tai-list" class="tai-list"></ul>
+        <div class="tai-footer">
+          <span>總計台數：</span>
+          <strong id="win-total-tai">0 台</strong>
+        </div>
+      </div>
+
+      <button onclick="location.reload()" class="game-btn btn-draw" style="width: 100%; margin-top: 14px;">再玩一局</button>
+    </div>
+  </div>
+
+  <!-- 2. 放槍警告彈窗 -->
+  <div id="lose-modal" class="modal" style="display: none;">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card lose">
+      <div class="win-banner lose-banner">💥 慘烈放槍！包大牌！ 💥</div>
+      <p id="lose-opponent-desc" class="win-subtitle" style="color: #ff8a80;">你不聽 AI 勸告打了危險生張！</p>
+      <div class="winning-showcase">
+        <span id="lose-tile-label" class="win-label">胡你的這張牌：</span>
+        <div id="lose-tile-box"></div>
+      </div>
+      <button onclick="location.reload()" class="game-btn btn-draw" style="width: 100%; margin-top: 15px; background: #c62828;">乖乖付錢，再來一局</button>
+    </div>
+  </div>
+
+  <!-- 3. 荒莊流局結算彈窗 -->
+  <div id="draw-game-modal" class="modal" style="display: none;">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card draw-card">
+      <div class="win-banner draw-banner">🍂 荒 莊 流 局 🍂</div>
+      <p class="win-subtitle" style="color: #cfd8dc;">牌山 72 張已全數摸完，本局四家平手！</p>
+      <div class="draw-review-box">
+        <div class="review-title">🤖 AI 副駕駛局後戰報覆盤：</div>
+        <p id="draw-review-text" class="review-desc"></p>
+      </div>
+      <button onclick="location.reload()" class="game-btn btn-draw" style="width: 100%; margin-top: 15px; background: linear-gradient(to bottom, #78909c, #455a64); color: #fff;">
+        🔄 再戰一局
+      </button>
+    </div>
+  </div>
+
+  <!-- 4. 電腦胡牌 / 電腦互抓放槍結算彈窗 -->
+  <div id="bot-win-modal" class="modal" style="display: none;">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card bot-win-card">
+      <div id="bot-win-banner" class="win-banner bot-banner">🀄 電腦胡牌！ 🀄</div>
+      <p id="bot-win-subtitle" class="win-subtitle" style="color: #ffe082;"></p>
+      <div class="winning-showcase">
+        <span id="bot-win-tile-label" class="win-label">胡牌張：</span>
+        <div id="bot-win-tile-box"></div>
+      </div>
+      <p style="font-size: 13px; color: #a5d6a7; margin-top: 8px;">🛡️ 局後評價：你成功防守下車，一毛錢都沒輸！</p>
+      <button onclick="location.reload()" class="game-btn btn-draw" style="width: 100%; margin-top: 15px; background: linear-gradient(to bottom, #ab47bc, #7b1fa2); color: #fff;">
+        🔄 再來一局
+      </button>
+    </div>
+  </div>
+
+  <script src="mahjongEngine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
