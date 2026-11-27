@@ -21,6 +21,7 @@
 [Hw7](<Homework/Hw7(week8)/>) | [AI 文件助教](<Homework/Hw7(week8)/>) | 以 RAG＋Ollama 打造的 PDF 問答系統，上傳講義即可用自然語言提問並附引用來源與頁碼
 [Hw8](<Homework/Hw8(week9)/>) | [MyShop POS 個人商店](<Homework/Hw8(week9)/>) | Cloudflare Workers + D1 全端 POS 系統，含 PBKDF2 認證、開店模板、金額防竄改點單、交易快照、每日結算與商品軟刪除（部署網址：[myshop.w0xie-1201.workers.dev](https://myshop.w0xie-1201.workers.dev)）
 [Hw9](<Homework/Hw9(week10)/>) | [MyShop POS npm 套件](<Homework/Hw9(week10)/>) | 將 Hw8 的 Cloudflare Workers + D1 POS 核心邏輯包裝成 npm 套件 `@xie00000/myshop-pos`，匯出 API 路由、開店模板、驗證與 Session 簽章工具（[npm](https://www.npmjs.com/package/@xie00000/myshop-pos)）
+[Hw11](<Homework/Hw11(week12)/>) | [從 LLM API 到手刻一個 AI Agent](<Homework/Hw11(week12)/>) | 純 Node.js 無套件實作：本地工具、Tool Calling JSON 協定、ReAct Agent 迴圈，支援真實 LLM API 與離線模擬雙模式（[README](<Homework/Hw11(week12)/README.md>)）
 
 ## 系統展示（Hw5 微服務系統）
 
